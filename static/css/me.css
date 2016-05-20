@@ -1,0 +1,404 @@
+.vertical_scrollbar_left {
+      unicode-bidi:bidi-override;
+      direction: rtl;
+      overflow: auto;
+      overflow-x: hidden;
+      float:left;
+      display:block; 
+      width:30%;
+      z-index:3; 
+      height:90%; 
+      position:absolute;
+      }
+
+canvas
+{
+ width: 100%;
+ height: 100%;
+}
+
+body
+{
+ margin: 0px;
+ background-color: #647070;
+ background-color: #F0F0F0;
+ background-color: #666666;
+ color:#2B2C2C;
+ font-family: Open Sans, Helvetica;
+ font-weight: 100;
+ font-size: 15px	
+}
+
+div.header
+{
+ margin: 0px;
+ background-color: #333333;
+}
+
+div.content
+{
+ margin: 5px;
+ background-color:  #F0F0F0; 
+}
+
+h1
+{
+ margin:3px;
+ display: inline-block;
+}
+
+input,select,button
+{
+ font-family: Open Sans, Helvetica;
+ padding:2px;
+}
+
+button,a.button
+{
+ background-color: #333333;
+ border:0px;
+ padding:6px;
+ border-radius:5px;
+ color:#D6D6D6;
+ text-decoration:none;
+}
+input,select
+{
+ margin:0px;
+ border:0px;
+ color:#2B2C2C;
+ background-color:#B2B8B8;
+ /*background-color: #647070;*/
+}
+
+select, textarea, input[type="text"], input[type="password"], input[type="datetime"], 
+input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], 
+input[type="week"], input[type="number"], input[type="email"], input[type="url"], 
+input[type="search"], input[type="tel"], input[type="color"]
+{
+width:auto;
+padding-top:5px;
+margin-bottom: 0px;
+font-size:0.9em;
+}
+
+label {background-color:#666666}
+label.campo
+{
+ /*background-color:#838D8D;*/
+ /*background-color:#333333;*/
+ display: inline-block;
+ color:#D6D6D6;
+ padding:3px;
+ padding-bottom:3px;
+ margin-top:2px;
+ /*width:9em;*/
+}
+
+
+a.link
+{
+ color:#333333;
+ text-decoration:none;
+}
+a.link:hover
+{
+ color:#fff;
+ cursor:pointer;
+}
+
+
+#dbmanage
+{
+width:100%;
+border-collapse:collapse;
+/*font-size:1em;*/
+margin-left:5px;
+}
+#dbmanage td, #dbmanage th
+{
+font-size:1em;
+/*border:1px solid;*/
+border-color:#D6D6D6;
+border: 1px solid rgba(200, 200, 200, .0);
+background-clip: padding-box;
+padding:5px 7px 5px 7px;
+}
+#dbmanage th, #dbmanage li
+{
+font-size:1.1em;
+font-style:normal;
+text-align:left;
+padding-top:6px;
+padding-bottom:6px;
+color:#ffffff;
+color:#cccccc;
+}
+#dbmanage th
+{
+background-color:#5A5A5A;
+background-color:#c34c4c;
+}
+
+#dbmanage tr.sol td
+{
+color:#000000;
+padding-top:10px;
+padding-bottom:10px;
+background-color:#EEEEEE;
+background-color:#A3A3A3;
+}
+#dbmanage tr.alt td
+{
+color:#000000;
+padding-top:10px;
+padding-bottom:10px;
+background-color:#FAFAFA;
+background-color:#C2C2C2;
+}
+
+#dbmanage tr.dit td
+{
+color:#000000;
+padding-top:10px;
+padding-bottom:10px;
+background-color:#FAFAFA;
+background-color:#C2C2C2;
+}
+
+
+table
+{
+    /*display: block;*/
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    float:bottom;
+}
+
+button:hover,a.button:hover
+{
+ background:#333333;
+ color:#ffffff;
+ cursor:pointer;
+}
+
+#dbmanage th.expand:hover
+{
+ color:#ffffff;
+ cursor:pointer;
+}
+
+
+
+/* formattazione table makEasy */
+.makEasy
+{
+width:100%;
+border-collapse:collapse;
+font-size:1em;
+/*margin-left:5px;*/
+/*background-color: #666666;*/
+}
+.makEasy td, .makEasy th
+{
+/*font-size:1em;*/
+border-color:#D6D6D6;
+border: 1px solid rgba(200, 200, 200, .0);
+background-clip: padding-box;
+padding:1px 9px 9px 9px;
+}
+.makEasy th, .makEasy li
+{
+font-size:1.1em;
+font-style:normal;
+text-align:left;
+padding-top:6px;
+padding-bottom:6px;
+color:#ffffff;
+color:#cccccc;
+}
+.makEasy th
+{
+background-color:#5A5A5A;
+background-color:#c34c4c;
+}
+.makEasy tr.sol td
+{
+color:#000000;
+padding-top:10px;
+padding-bottom:10px;
+background-color:#EEEEEE;
+background-color:#A3A3A3;
+}
+.makEasy tr.alt td
+{
+color:#000000;
+padding-top:10px;
+padding-bottom:10px;
+background-color:#FAFAFA;
+background-color:#C2C2C2;
+}
+.makEasy th.expand:hover
+{
+ color:#ffffff;
+ cursor:pointer;
+}
+
+.makEasy td.edit input, .makEasy td.edit select
+{
+ background-color:#FAFAFA;
+}
+
+.makEasy table td.edit
+{
+ background-color:#FAFAFA;
+}
+
+.makEasy table tr.buttons td
+{
+padding-top:10px;
+padding-bottom:10px;
+}
+
+/* fine formattazione table makEasy */
+
+
+/* formattazione meTabs */
+ul.meTabs
+{
+ margin-bottom:0px;
+ padding-left:0px;
+}
+ul.meTabs li
+{
+ text-decoration:none;
+ font-weight: bold;
+ display:inline-block;
+ background-color:#c34c4c;
+ color:#cccccc;
+ font-size: 1.1em;
+ margin-right:2px;
+ padding: 5px 50px 3px 5px;
+ vertical-align:bottom;
+}
+
+ul.meTabs li:hover , ul.meTabs li[status="active"]
+{
+ padding-bottom:7px; 
+}
+
+ul.meTabs li:active, ul.meTabs li[status="active"]
+{
+ color:#ffffff;
+}
+
+table.meTabs
+{
+ background-color:#7777777;
+ border-color:#aaaaaa;
+}
+
+/* fine formattazione meTabs */
+
+
+/*formattazione menu*/
+
+ul#menu
+{
+ display: inline;
+}
+ul#menu li
+{
+ list-style:none;
+ display: inline;
+ margin-right:8px;
+ padding:3px;
+ color:#D6D6D6;
+ position:relative;
+}
+
+ul#menu li a
+{
+ padding-bottom:8px;
+ 
+}
+
+ul#menu li a:hover
+{
+ background:#333333;
+ color:#ffffff;
+ cursor:pointer;
+}
+
+ul#menu ul{
+    margin:0px;
+    padding-bottom:8px;
+    padding-left:0px;
+    display:inline-block;
+    /*list-style:none;*/
+    opacity:0;
+    visibility:hidden;
+    position:absolute;
+    top:28px;
+    left:0;
+    z-index:9999;
+    background:#333333;
+}
+ 
+ul#menu li:hover > ul {
+    opacity:1;
+    visibility:visible;
+}
+ 
+ul#menu ul li {
+    float:none;
+    display:block;
+    border:0;
+}
+
+
+ul#menu ul a.menu {
+    padding:3px;
+    width:100px;
+    display:block;
+    white-space:nowrap;
+    float:none;
+    color:#D6D6D6;
+    text-decoration: none;
+}
+
+ul#menu ul a:hover {
+    color:#ffffff;
+}
+
+a#menu
+{
+ background:#333333;
+ color:#D6D6D6;
+ cursor:pointer;
+ text-decoration:none;
+}
+
+/*fine formattazione menu*/
+
+/*formattazione filtri*/
+tr.filter td
+{
+	padding:0px;
+}
+
+tr.filter td select
+{
+	background-color:#FAFAFA;
+	width:100%;
+}
+
+tr.filter td input
+{
+	background-color:#FAFAFA;
+	width:100%;
+}
+/*fine formattazione filtri*/
+
+
