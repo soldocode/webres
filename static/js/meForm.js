@@ -42,7 +42,7 @@ meForm.editSwitchFields = function(vars) //crea selezione da un elenco che cambi
   var switch_function='switchFields("'+vars.name+'",'+JSON.stringify(vars.switch)+')';
   args.onchange=switch_function;
   vars.args=args;
-  return editList(vars)
+  return meForm.editList(vars)
  }
 
 
@@ -145,9 +145,9 @@ meForm.makeSubForm = function (vars)// sub-form singolo
     }
   }
   rows += '</body></table></td></tr>';
-  //$('tr#'+vars.id).before(rows);
+  
   return rows
-  //$(".value").on("change",update_shape);
+  
 }
 
 
