@@ -39,7 +39,7 @@ meForm.editList = function(vars) //crea selezione da un elenco//
 meForm.editSwitchFields = function(vars) //crea selezione da un elenco che cambia i campi visualizzati//
  {
   var args = vars.args || {};
-  var switch_function='switchFields("'+vars.name+'",'+JSON.stringify(vars.switch)+')';
+  var switch_function='meForm.switchFields("'+vars.name+'",'+JSON.stringify(vars.switch)+')';
   args.onchange=switch_function;
   vars.args=args;
   return meForm.editList(vars)
