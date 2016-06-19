@@ -153,7 +153,7 @@ meForm.makeSubForm = function (vars)// sub-form singolo
 
 meForm.addSForm = function(vars) //aggiunge un sub-form o maschera annidata//
 {
-  $('tr#'+vars.id).before(SFormHeader(vars));
+  $('tr#'+vars.id).before(this.SFormHeader(vars));
   var count=$("input[name='id_"+vars.id+"']").val();
   var SFid='"'+vars.id+count+'"'
 
@@ -183,7 +183,7 @@ meForm.addSForm = function(vars) //aggiunge un sub-form o maschera annidata//
   rows += '</body></table></td></tr>';
   $('tr#'+vars.id).before(rows);
 
-  $(".value").on("change",update_shape);
+  //$(".value").on("change",update_shape);
 }
 
 
