@@ -1,6 +1,6 @@
 // meForm - JavaScript Module     // 
 // Riccardo Soldini  2015-2016    //
-// 								  //
+// 								                //
 // TODO: tutto da sistemare!!     //
 
 
@@ -115,7 +115,7 @@ meForm.makeSubForm = function (vars)// sub-form singolo
   var SFid=vars.id;
   var rows='<tr id="header_'+vars.id+'"><th>'+vars.label+'</th>'
   rows +=  '<th class="expand" id="'+vars.id+'"'
-  rows += ' onclick=expand("'+SFid+'")>-</th></tr>';
+  rows += ' onclick=meForm.expand("'+SFid+'")>-</th></tr>';
   rows=rows+"<tr id="+SFid
   if (vars.visible=="false"){rows += ' style="display: none;"'};
   rows+= "><td colspan=3><table class='makEasy' width='100%'>"+
@@ -350,7 +350,7 @@ meForm.editRowTable= function (vars)
   var tid = vars.id || '';
   var buttons = vars.buttons || [];
   html='<tr class="sol">';
-  for (h in vars.col_header) {html +='<td><input id="'+h+'" value="ciao"></td>'}
+  for (h in vars.col_header) {html +='<td><input id="'+h+'" value="content"></td>'}
   html +='</tr>';
   $('table#'+tid).append(html);
 }
