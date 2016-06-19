@@ -4,7 +4,7 @@
 // TODO: tutto da sistemare!!     //
 
 
-var meForm={LastUpdate:'02-01-2016'};
+var meForm={LastUpdate:'19-06-2016'};
 
 
 meForm.editList = function(vars) //crea selezione da un elenco//
