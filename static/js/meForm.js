@@ -129,13 +129,13 @@ meForm.makeSubForm = function (vars)// sub-form singolo
     switch(form_data.class)
     {
      case 'list':
-       rows += editList(form_data);
+       rows += this.editList(form_data);
        break;
      case 'number':
-       rows += editNumber(form_data);
+       rows += this.editNumber(form_data);
        break;
      case 'multiple-subform':
-       rows += makeMSForm(form_data);
+       rows += this.makeMSForm(form_data);
        break;
      case 'button':
        rows += '<tr><td><a class="button" data-w2p_disable_with="default">'+form_data.label+'</a></td></tr>';
@@ -168,13 +168,13 @@ meForm.addSForm = function(vars) //aggiunge un sub-form o maschera annidata//
     switch(form_data.class)
     {
      case 'list':
-       rows += editList(form_data);
+       rows += this.editList(form_data);
        break;
      case 'number':
-       rows += editNumber(form_data);
+       rows += this.editNumber(form_data);
        break;
      case 'multiple-subform':
-       rows += makeMSForm(form_data);
+       rows += this.makeMSForm(form_data);
        break;
      default:
        rows += '';
@@ -253,7 +253,7 @@ meForm.makeMSForm = function(vars)
     {
         row +=arg+'="'+args[arg]+'"';
     }
-  row += "onclick='addSForm("+JSON.stringify(vars)+")'"
+  row += "onclick='meForm.addSForm("+JSON.stringify(vars)+")'"
   row += ' >';
   row += vars.add_button.label+'</a><input name="id_'+vars.id+'" type="hidden" value="-1"></td></tr>';
   return row
