@@ -406,12 +406,36 @@ meForm.deployForm = function (form_title,form_data,idForm) //dispiega form legge
 
     }
 
-meForm.addTableRowButton = function (label,id,colspan)
+
+meForm.TR_BUTTONS = function(trId,btns,colspan)
+//////////////////////////////////////////////
+// btns:{"button1":{"title":"Button 1",
+//                  "arg":"arg"},
+//       "button2":{"title":"Button 2",
+//                  "arg":"arg"}
+//      }
+//////////////////////////////////////////////
+
 {
-    html='<tr><td colspan='+colspan+' style="border-top-width: 7px;border-bottom-width: 7px;">'
-    html+='<a onclick="confirm_'+label+'()" id="'+label+'_button_ok" class="button" data-w2p_disable_with="default">Conferma</a>'
-    html+='<span>  </span>'
-    html+='<a onclick="delete'+label+'('+id+')" id="'+label+'_button_del" class="button" data-w2p_disable_with="default">Elimina</a>'
-    html+='</td></tr>'
+	html='<tr class="buttons"><td colspan='+colspan+'>';
+	for (btn in btns)
+	{
+		html+='<span>  </span>';
+		html+='<a onclick="'+btn+'('+btns[btn].arg+')" id="btn_'+btn+'" class="button" >'+btns[btn].title+'</a>';
+    }
+    html+='</td></tr>';
     return html
 }
+
+
+meForm.addTableRowButton = function(label,id,colspan)/// da eliminare!!!
+{
+    html='<tr><td colspan='+colspan+' style="border-top-width: 7px;border-bottom-width: 7px;">';
+    html+='<a onclick="confirm_'+label+'()" id="'+label+'_button_ok" class="button" data-w2p_disable_with="default">Conferma</a>';
+    html+='<span>  </span>';
+    html+='<a onclick="delete'+label+'('+id+')" id="'+label+'_button_del" class="button" data-w2p_disable_with="default">Elimina</a>';
+    html+='</td></tr>';
+    return html
+}
+
+
