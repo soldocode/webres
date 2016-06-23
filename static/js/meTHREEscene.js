@@ -32,7 +32,7 @@ document.getElementById("3Dscene").appendChild(renderer.domElement);
 var ambientLight = new THREE.AmbientLight(0x888888);
 scene.add(ambientLight);
 
-var material = new THREE.MeshLambertMaterial({color: 0x888888});
+var material = new THREE.MeshLambertMaterial({color: 0x666666});
 var material2 = new THREE.MeshLambertMaterial({color: 0xdddddd});
 var extshape;
 var objects={};
