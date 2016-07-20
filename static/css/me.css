@@ -47,7 +47,7 @@ h1
  display: inline-block;
 }
 
-input,select,button
+input,select,button,textarea
 {
  font-family: Open Sans, Helvetica;
  padding:2px;
@@ -79,7 +79,7 @@ input[type="search"], input[type="tel"], input[type="color"]
 width:auto;
 padding-top:5px;
 margin-bottom: 0px;
-font-size:0.9em;
+font-size:1em;
 }
 
 label {background-color:#666666}
@@ -248,6 +248,7 @@ background-color:#C2C2C2;
 .makEasy td.edit input, .makEasy td.edit select
 {
  background-color:#FAFAFA;
+ /*height:30px;*/
 }
 
 .makEasy table td.edit
