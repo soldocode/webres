@@ -34,6 +34,7 @@ scene.add(ambientLight);
 
 var material = new THREE.MeshLambertMaterial({color: 0x666666});
 var material2 = new THREE.MeshLambertMaterial({color: 0xdddddd});
+var lineMaterial = new THREE.LineBasicMaterial({color: 0x000000});
 var extshape;
 var objects={};
 
