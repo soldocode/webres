@@ -1,6 +1,6 @@
 
 
-function draw_sheet(item)
+function make_sheet(item)
     {
      var meObject;        
      if (item.Project.Path)
@@ -11,7 +11,7 @@ function draw_sheet(item)
     };
     
 
-function draw_profile(item)
+function make_profile(item)
     {
      var meObject = new THREE.Object3D();
 
@@ -19,14 +19,14 @@ function draw_profile(item)
     };
 
 
-function draw_component(item)
+function make_component(item)
     {
      var meObject = new THREE.Object3D();
 
      return meObject;
     };
     
-function draw_assembly(item)
+function make_assembly(item)
     {
      var meObject = new THREE.Object3D();
 
