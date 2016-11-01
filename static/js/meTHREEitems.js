@@ -1,17 +1,18 @@
 
+var meItems={LastUpdate:'01-11-2016'};
 
-function make_sheet(item)
+meItems.makeSheet= function(item)
     {
      var meObject;        
-     if (item.Project.Path)
-     {
-         meObject=ITEMS3D(item.Project.Path)(item);
-     }   
+     //if (item.Project.Path)
+     //{
+     //    meObject=ITEMS3D(item.Project.Path)(item);
+     //}   
      return meObject;
     };
     
 
-function make_profile(item)
+meItems.makeProfile = function(item)
     {
      var meObject = new THREE.Object3D();
 
@@ -19,14 +20,14 @@ function make_profile(item)
     };
 
 
-function make_component(item)
+meItems.makeComponent= function(item)
     {
      var meObject = new THREE.Object3D();
 
      return meObject;
     };
     
-function make_assembly(item)
+meItems.makeAssembly= function(item)
     {
      var meObject = new THREE.Object3D();
 
