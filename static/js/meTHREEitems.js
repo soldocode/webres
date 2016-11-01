@@ -2,8 +2,11 @@
 
 function draw_sheet(item)
     {
-     var meObject = new THREE.Object3D();
-
+     var meObject;        
+     if (item.Project.Path)
+     {
+         meObject=ITEMS3D(item.Project.Path)(item);
+     }   
      return meObject;
     };
     
