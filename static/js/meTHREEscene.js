@@ -1,7 +1,7 @@
 function render()
             {
 		requestAnimationFrame(render);
-                //cameraControls.update();
+                cameraControls.update();
                 renderer.render(scene, camera);
 			};
 
