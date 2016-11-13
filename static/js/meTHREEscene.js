@@ -15,10 +15,16 @@ var viewSize=500;
 var aspectRatio=wWidth/wHeight;
 var scene = new THREE.Scene();
 
-var camera = new THREE.OrthographicCamera(-aspectRatio*viewSize,
-                                           aspectRatio* viewSize,
-                                           viewSize,
-                                           -viewSize, -100000, 100000 );
+var camera = new THREE.OrthographicCamera(-aspectRatio*viewSize/1.5,
+                                           aspectRatio* viewSize/1.5,
+                                           viewSize/1.5,
+                                           -viewSize/1.5, -100000, 100000 );
+
+     //camera.left = -aspectRatio*viewSize/1.5 ;
+     //camera.right = aspectRatio* viewSize /1.5;
+     //camera.top = viewSize /1.5;
+     //camera.bottom = - viewSize/1.5 ;
+     //camera.updateProjectionMatrix();
 
 var renderer = new THREE.WebGLRenderer({alpha: true,antialias:true});
 renderer.shadowMapEnabled = true;
