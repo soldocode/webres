@@ -55,7 +55,7 @@ camera.add( pointLightOne );
 camera.position.z= 8000;
 camera.position.y= 0;
 camera.position.x= 0;
-//camera.lookAt(new THREE.Vector3(0,0,0));
+camera.lookAt(new THREE.Vector3(0,0,0));
 
 
 
