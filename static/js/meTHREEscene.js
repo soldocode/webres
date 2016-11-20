@@ -1,6 +1,8 @@
 function render()
             {
+		
 		requestAnimationFrame(render);
+		TWEEN.update();
                 cameraControls.update();
                 renderer.render(scene, camera);
 			};
