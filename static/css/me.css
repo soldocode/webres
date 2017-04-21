@@ -327,7 +327,7 @@ ul#menu li a
 
 ul#menu li a:hover
 {
- background:#333333;
+ /*background:#333333;*/
  color:#ffffff;
  cursor:pointer;
 }
@@ -344,7 +344,7 @@ ul#menu ul{
     top:28px;
     left:0;
     z-index:9999;
-    background:#333333;
+    /*background:#333333;*/
 }
  
 ul#menu li:hover > ul {
@@ -375,7 +375,7 @@ ul#menu ul a:hover {
 
 a#menu
 {
- background:#333333;
+ /*background:#333333*/;
  color:#D6D6D6;
  cursor:pointer;
  text-decoration:none;
