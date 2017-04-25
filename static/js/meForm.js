@@ -4,7 +4,7 @@
 // TODO: tutto da sistemare!!     //
 
 
-var meForm={LastUpdate:'19-06-2016'};
+var meForm={LastUpdate:'25-04-2017'};
 
 
 meForm.editList = function(vars) //crea selezione da un elenco//
@@ -438,4 +438,72 @@ meForm.addTableRowButton = function(label,id,colspan)/// da eliminare!!!
     return html
 }
 
+
+meForm.loadMenu=function(menu) {this.menu=menu;}
+
+
+meForm.updateMenu=function()
+{
+    var subMenu=function(sub_menu)
+    {
+         menu_html="<ul style='width: 250px;'>"
+         for (var opt in sub_menu)
+         {
+                if (sub_menu[opt].show)
+                    {
+                        var action=""
+                        if (sub_menu[opt].on_click){action="onclick="+'"'+sub_menu[opt].on_click+'"'}
+                        menu_html+="<li id='"+opt+"'><a "+action+" class='menu'>"+opt+"</a>";
+                        if (sub_menu[opt].child) {menu_html+=subMenu(sub_menu[opt].child)}
+                        menu_html+="</li>";
+                    }
+          }
+          menu_html+="</ul>"
+          return menu_html
+     }
+
+     var menu_html="<ul id='menu' style='display:inline;'>"
+     for (var opt in this.menu)
+            {
+                if (this.menu[opt].show)
+                {
+                    var action=""
+                    if (this.menu[opt].on_click){action="onclick="+'"'+this.menu[opt].on_click+'"'}
+                    menu_html+="<li id='"+opt+"'><a "+action+" class='menu'>"+opt+"</a>";
+                    if (this.menu[opt].child) {menu_html+=subMenu(this.menu[opt].child)}
+                    menu_html+="</li>";
+                }
+            }
+            menu_html+="</ul>"
+            $("ul#menu").replaceWith(menu_html);
+}
+
+
+meForm.enableMenuOption=function(opt)
+        {
+          var enableOption=function(menu,opt)
+          {
+            for (var seek_opt in menu)
+                {
+                    if (seek_opt==opt) {menu[seek_opt].show=true;}
+                    else {enableOption(menu[seek_opt].child,opt)}
+                }
+          }
+          enableOption(this.menu,opt);
+        }
+
+
+
+meForm.disableMenuOption=function(opt)
+        {
+          var disableOption=function(menu,opt)
+          {
+            for (var seek_opt in menu)
+                {
+                    if (seek_opt==opt) {menu[seek_opt].show=false;}
+                    else {disableOption(menu[seek_opt].child,opt)}
+                }
+          }
+          disableOption(this.menu,opt);
+        }
 
