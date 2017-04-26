@@ -189,4 +189,37 @@ function exportSTL(object)
      return exSTL.parse(object);
     }
 
+
+function rotateCamera(position)
+      {
+       var from =
+           {
+            x: camera.position.x,
+            y: camera.position.y,
+            z: camera.position.z,
+            upX:camera.up.x,
+            upY:camera.up.y,
+            upZ:camera.up.z
+           };
+
+
+       var to=VIEW_POSITION[position]
+
+       var tween = new TWEEN.Tween(from).to(to, 2000)
+            .easing(TWEEN.Easing.Bounce.Out)
+            .onUpdate(function () {
+            camera.position.set(this.x, this.y, this.z);
+            camera.up.set(this.upX,this.upY,this.upZ)
+
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+        })
+            .onComplete(function () {
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+        })
+            .start();
+
+      }
+
+
 var meTHREE={makeRect:makeRect}
