@@ -236,4 +236,4 @@ function rotateCamera(position)
       }
 
 
-var meTHREE.makeRect=makeRect
+meTHREE.makeRect=makeRect
