@@ -20,6 +20,24 @@ function render()
   	};
 
 
+function updateWindow()
+        {
+            wWidth = parseFloat($('#3Dscene').css('width'));
+            wHeight = parseFloat($('#3Dscene').css('height'));
+            //viewSize=500;
+            aspectRatio=wWidth/wHeight;
+            camera.left = -aspectRatio*viewSize/1.5 ;
+            camera.right = aspectRatio* viewSize /1.5;
+            camera.top = viewSize /1.5;
+            camera.bottom = - viewSize/1.5 ;
+            camera.updateProjectionMatrix();
+            renderer.setSize(wWidth, wHeight);
+            cameraControls=new THREE.OrthographicTrackballControls(camera,renderer.domElement);
+            render();
+        }
+
+window.addEventListener('resize',updateWindow);
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 
