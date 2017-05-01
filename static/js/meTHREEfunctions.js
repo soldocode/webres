@@ -1,3 +1,17 @@
+/////////////////////////////////////////////////////////////////////////////////////////
+//
+// meTHREEfunctions.js - function for makEasy-THREE.js scene
+//
+// riccardo.soldini@gmail.com
+//
+// last update: 01/05/17
+//
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+var meTHREE={}
+
+
 function make_rect_path(length,width)
     {
      var path = [{X:-length/2,Y:-width/2},
@@ -222,4 +236,4 @@ function rotateCamera(position)
       }
 
 
-var meTHREE={makeRect:makeRect}
+var meTHREE.makeRect=makeRect
