@@ -17,9 +17,8 @@ function render()
 		TWEEN.update();
                 cameraControls.update();
 	        raycaster.setFromCamera( mouse, camera );
-	        console.log(mouse);
 	        var intersects = raycaster.intersectObjects( scene.children );
-	        console.log(intersects);
+	        if ( intersects.length > 0 ){console.log(intersects);}
                 renderer.render(scene, camera);
   	};
 
@@ -49,8 +48,8 @@ function onMouseMove( event )
 	// calculate mouse position in normalized device coordinates
 	// (-1 to +1) for both components
 
-	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+	mouse.x = ( event.clientX / wWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / wHeight ) * 2 + 1;
 
 	}
 
