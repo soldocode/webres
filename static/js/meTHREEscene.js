@@ -16,6 +16,12 @@ function render()
 		requestAnimationFrame(render);
 		TWEEN.update();
                 cameraControls.update();
+	        raycaster.setFromCamera( mouse, camera );
+	        var intersects = raycaster.intersectObjects( scene.children );
+	        for ( var i = 0; i < intersects.length; i++ )
+		    {
+		     cosole.log(intersects[ i ].object);
+	       	    }
                 renderer.render(scene, camera);
   	};
 
@@ -37,6 +43,20 @@ function updateWindow()
         }
 
 window.addEventListener('resize',updateWindow);
+
+
+function onMouseMove( event ) 
+	{
+
+	// calculate mouse position in normalized device coordinates
+	// (-1 to +1) for both components
+
+	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+	}
+
+window.addEventListener( 'mousemove', onMouseMove, false );
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -77,6 +97,11 @@ camera.lookAt(new THREE.Vector3(0,0,0));
 
 //camera controls
 var cameraControls = new THREE.OrthographicTrackballControls(camera,renderer.domElement);
+
+
+//raycaster controls
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
 
 
 scene.add(ambientLight);
