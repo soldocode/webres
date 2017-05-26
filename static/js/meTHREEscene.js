@@ -17,11 +17,9 @@ function render()
 		TWEEN.update();
                 cameraControls.update();
 	        raycaster.setFromCamera( mouse, camera );
+	        console.log(mouse);
 	        var intersects = raycaster.intersectObjects( scene.children );
-	        for ( var i = 0; i < intersects.length; i++ )
-		    {
-		     cosole.log(intersects[ i ].object);
-	       	    }
+	        console.log(intersects);
                 renderer.render(scene, camera);
   	};
 
