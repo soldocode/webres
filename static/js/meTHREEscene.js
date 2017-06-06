@@ -2,7 +2,7 @@
 //
 //  meTHREEscene.js - define makeEasy-THREE.js scene
 //  Soldini Riccardo - 2015
-//  
+//
 //  riccardo.soldini@gmail.com
 //
 //  last update: 01/05/17
@@ -12,14 +12,11 @@
 
 
 function render()
-       {	
+       {
 		requestAnimationFrame(render);
 		TWEEN.update();
-                cameraControls.update();
-	        raycaster.setFromCamera( mouse, camera );
-	        var intersects = raycaster.intersectObjects( scene.children );
-	        if ( intersects.length > 0 ){console.log(intersects);}
-                renderer.render(scene, camera);
+        cameraControls.update();
+        renderer.render(scene, camera);
   	};
 
 
@@ -42,18 +39,82 @@ function updateWindow()
 window.addEventListener('resize',updateWindow);
 
 
-function onMouseMove( event ) 
+function detectObjects()
+{
+ if (!(detection_in_progress))
+ {
+    detection_in_progress=true;
+    raycaster.setFromCamera( mouse, camera );
+    intersection = raycaster.intersectObjects(scene.children,true);
+    if (selection.length!=0)
+        {
+           selection[0].object.material=selection[0].material
+           selection.pop();
+        }
+    if (intersection.length!=0)
+    {
+        //console.log(intersection.length,' objects detected');
+        selection.push({object:intersection[0].object, material:intersection[0].object.material})
+        intersection[0].object.material=selectedLine
+    }
+ }
+}
+
+function onMouseMove( event )
 	{
 
 	// calculate mouse position in normalized device coordinates
 	// (-1 to +1) for both components
 
-	mouse.x = ( event.clientX / wWidth ) * 2 - 1;
-	mouse.y = - ( event.clientY / wHeight ) * 2 + 1;
+	var rect =document.getElementById("3Dscene").getBoundingClientRect();
+    mouse.x = ( (event.clientX - rect.left) /  wWidth ) * 2 - 1;
+	mouse.y = - ( (event.clientY - rect.top) /  wHeight ) * 2 + 1;
 
-	}
+    detectObjects()
+
+
+    detection_in_progress=false;
+    //if (raycasterWorking==false)
+    //{
+    //raycasterWorking=true;
+	//raycaster.setFromCamera( mouse, camera );
+    //intersection = raycaster.intersectObjects(scene.children,true);
+    //if (intersection.length!=0)
+    //    {
+    //        console.log('on')
+    //        console.log(objSelection[0].material)
+     //       for (obj in objSelection)
+    //          {
+    //              if (obj.object!=null)
+    //               {
+    //                   console.log('sco');
+    //                   console.log(obj.object.material.color);
+    //                   obj.object.material=material1
+    //               }
+    //          }
+
+    //        objSelection=[{}]
+    //        objSelection[0].material=intersection[0].object.material;
+    //        objSelection[0].object=intersection[0].object;
+    //        intersection[0].object.material=selectedLine;
+    //        console.log( objSelection[0].material.color);
+    //        raycasterWorking=false;
+    //    }
+    //else{
+    //      for (obj in objSelection)
+    //          {
+    //              console.log('off');
+    //              if (obj.object){obj.object.material=material2}
+    //          }
+    //       objSelection=[{}]
+    //       raycasterWorking=false;
+
+    //    }
+    //}
+}
 
 window.addEventListener( 'mousemove', onMouseMove, false );
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -99,6 +160,10 @@ var cameraControls = new THREE.OrthographicTrackballControls(camera,renderer.dom
 //raycaster controls
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
+var intersection
+var selection=[];
+var raycasterWorking=false
+var detection_in_progress=false;
 
 
 scene.add(ambientLight);
@@ -110,6 +175,7 @@ camera.add( pointLightOne );
 var material = new THREE.MeshLambertMaterial({color: 0x666666});
 var material2 = new THREE.MeshLambertMaterial({color: 0xdddddd});
 var lineMaterial = new THREE.LineBasicMaterial({color: 0x000000});
+var selectedLine = new THREE.LineBasicMaterial({color: 0xf44242});
 
 
 //scene objects
