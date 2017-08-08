@@ -174,8 +174,8 @@ camera.add( pointLightOne );
 //materials
 var material = new THREE.MeshLambertMaterial({color: 0x666666});
 var material2 = new THREE.MeshLambertMaterial({color: 0xdddddd});
-var lineMaterial = new THREE.LineBasicMaterial({color: 0x000000});
-var selectedLine = new THREE.LineBasicMaterial({color: 0xf44242});
+var lineMaterial = new THREE.LineBasicMaterial({color: 0x000000,linewidth: 3});
+var selectedLine = new THREE.MeshLambertMaterial({color: 0x6699cc});
 
 
 //scene objects

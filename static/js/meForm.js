@@ -1,17 +1,17 @@
-// meForm - JavaScript Module     // 
-// Riccardo Soldini  2015-2016    //
-// 								                //
+// meForm - JavaScript Module     //
+// Riccardo Soldini  2015-2017    //
+// 							      //
 // TODO: tutto da sistemare!!     //
 
 
-var meForm={LastUpdate:'25-04-2017'};
+var meForm={LastUpdate:'08-08-2017'};
 
 
 meForm.editList = function(vars) //crea selezione da un elenco//
   {
     var vars = vars || {};
     var label = vars.label || '';
-    var value = vars.value || -1;
+    var value = String(vars.value) || -1;
     var name = vars.name || '';
     var options = vars.values || {};
     var size = vars.size || 'auto';
@@ -22,15 +22,18 @@ meForm.editList = function(vars) //crea selezione da un elenco//
             '<th colspan="2" id='+form_name+'>'+label+'</th>'+
             '<td>'+
             '<select name='+form_name+' ';
-
     for  (arg in args)
     {
         row +=arg+"='"+args[arg]+"'";
     }
     row += ' >';
     for  (index in options)
-     {row +='<option value='+options[index].value+'>'+options[index].text+'</option>'}
+     {
+         row +='<option '
+         if (options[index].value==value){row += ' selected '}
+         row +='value='+options[index].value+'>'+options[index].text+'</option>'
 
+     }
     row +='</select></td></tr>';
     return row
   }
@@ -111,7 +114,6 @@ meForm.changeFields = function(vars)
 meForm.makeSubForm = function (vars)// sub-form singolo
 {
 
-
   var SFid=vars.id;
   var rows='<tr id="header_'+vars.id+'"><th>'+vars.label+'</th>'
   rows +=  '<th class="expand" id="'+vars.id+'"'
@@ -125,7 +127,6 @@ meForm.makeSubForm = function (vars)// sub-form singolo
   for (index in vars.form_data)
   {
     form_data=vars.form_data[index];
-    //form_data.name=vars.id+'['+count+']['+form_data.name+']';
     switch(form_data.class)
     {
      case 'list':
@@ -145,9 +146,9 @@ meForm.makeSubForm = function (vars)// sub-form singolo
     }
   }
   rows += '</body></table></td></tr>';
-  
+
   return rows
-  
+
 }
 
 
@@ -183,7 +184,6 @@ meForm.addSForm = function(vars) //aggiunge un sub-form o maschera annidata//
   rows += '</body></table></td></tr>';
   $('tr#'+vars.id).before(rows);
 
-  //$(".value").on("change",update_shape);
 }
 
 
@@ -354,7 +354,7 @@ meForm.editRowTable= function (vars)
   html +='</tr>';
   $('table#'+tid).append(html);
 }
-    
+
 
 meForm.deployForm = function (form_title,form_data,idForm) //dispiega form leggendo struttura json//
 {
