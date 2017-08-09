@@ -164,18 +164,22 @@ meForm.addSForm = function(vars) //aggiunge un sub-form o maschera annidata//
 
   for (index in vars.form)
   {
-    form_data=vars.form[index];
-    form_data.name=vars.id+'['+count+']['+form_data.name+']';
-    switch(form_data.class)
+    var fData=JSON.parse(JSON.stringify(vars.form[index]));
+    if (vars.values)
+    {
+        if (vars.values[fData.name]){fData.value=vars.values[fData.name]}
+    }
+    fData.name=vars.id+'['+count+']['+fData.name+']';
+    switch(fData.class)
     {
      case 'list':
-       rows += this.editList(form_data);
+       rows += this.editList(fData);
        break;
      case 'number':
-       rows += this.editNumber(form_data);
+       rows += this.editNumber(fData);
        break;
      case 'multiple-subform':
-       rows += this.makeMSForm(form_data);
+       rows += this.makeMSForm(fData);
        break;
      default:
        rows += '';
