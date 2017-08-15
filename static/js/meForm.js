@@ -4,14 +4,18 @@
 // TODO: tutto da sistemare!!     //
 
 
-var meForm={LastUpdate:'08-08-2017'};
+var meForm={LastUpdate:'15-08-2017'};
 
 
-meForm.editList = function(vars) //crea selezione da un elenco//
+//meForm.editList
+//make select from list
+
+meForm.editList = function(vars,v=-1)
   {
+    //alert(v);
     var vars = vars || {};
     var label = vars.label || '';
-    var value = String(vars.value) || -1;
+    var value = String(v);
     var name = vars.name || '';
     var options = vars.values || {};
     var size = vars.size || 'auto';
@@ -39,13 +43,13 @@ meForm.editList = function(vars) //crea selezione da un elenco//
   }
 
 
-meForm.editSwitchFields = function(vars) //crea selezione da un elenco che cambia i campi visualizzati//
+meForm.editSwitchFields = function(vars,value) //crea selezione da un elenco che cambia i campi visualizzati//
  {
   var args = vars.args || {};
   var switch_function='meForm.switchFields("'+vars.name+'",'+JSON.stringify(vars.switch)+')';
   args.onchange=switch_function;
   vars.args=args;
-  return meForm.editList(vars)
+  return meForm.editList(vars,value)
  }
 
 
@@ -65,12 +69,13 @@ meForm.switchFields = function(name,vars) //visualizzazione dinamica dei campi//
   update_shape();
  }
 
-
-meForm.editNumber = function(vars) //crea campo per numeri//
+//meForm.editNumber
+//make number field
+meForm.editNumber = function(vars,value=0)
   {
     var vars = vars || {};
     var label = vars.label || '';
-    var value = vars.value || 0;
+    //var value = vars.value || 0;
     var name = vars.name || '';
     var width = vars.width || 'auto';
     var onchange = vars.onchange || ''
@@ -152,11 +157,13 @@ meForm.makeSubForm = function (vars)// sub-form singolo
 }
 
 
-meForm.addSForm = function(vars) //aggiunge un sub-form o maschera annidata//
+meForm.addSForm = function(vars,values={}) //aggiunge un sub-form o maschera annidata//
 {
+  alert (JSON.stringify(values));
   $('tr#'+vars.id).before(this.SFormHeader(vars));
   var count=$("input[name='id_"+vars.id+"']").val();
   var SFid='"'+vars.id+count+'"'
+  var field_value
 
   var rows="<tr id="+SFid+"><td colspan=3><table class='makEasy' width='100%'>"+
            "<colgroup><col width='50%'><col width='5%'><col width='45%'></colgroup>"+
@@ -165,18 +172,21 @@ meForm.addSForm = function(vars) //aggiunge un sub-form o maschera annidata//
   for (index in vars.form)
   {
     var fData=JSON.parse(JSON.stringify(vars.form[index]));
-    if (vars.values)
-    {
-        if (vars.values[fData.name]){fData.value=vars.values[fData.name]}
-    }
+    //if (values)
+    //{
+    //    if (vars.values[fData.name]){fData.value=vars.values[fData.name]}
+    //}
+    field_value=values[fData.name] || fData.value
+    alert(field_value)
     fData.name=vars.id+'['+count+']['+fData.name+']';
+
     switch(fData.class)
     {
      case 'list':
-       rows += this.editList(fData);
+       rows += this.editList(fData,field_value);
        break;
      case 'number':
-       rows += this.editNumber(fData);
+       rows += this.editNumber(fData,field_value);
        break;
      case 'multiple-subform':
        rows += this.makeMSForm(fData);
