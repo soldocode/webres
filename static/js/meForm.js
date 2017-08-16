@@ -12,7 +12,6 @@ var meForm={LastUpdate:'15-08-2017'};
 
 meForm.editList = function(vars,v=-1)
   {
-    //alert(v);
     var vars = vars || {};
     var label = vars.label || '';
     var value = String(v);
@@ -75,7 +74,6 @@ meForm.editNumber = function(vars,value=0)
   {
     var vars = vars || {};
     var label = vars.label || '';
-    //var value = vars.value || 0;
     var name = vars.name || '';
     var width = vars.width || 'auto';
     var onchange = vars.onchange || ''
@@ -159,45 +157,69 @@ meForm.makeSubForm = function (vars)// sub-form singolo
 
 meForm.addSForm = function(vars,values={}) //aggiunge un sub-form o maschera annidata//
 {
-  alert (JSON.stringify(values));
-  $('tr#'+vars.id).before(this.SFormHeader(vars));
-  var count=$("input[name='id_"+vars.id+"']").val();
-  var SFid='"'+vars.id+count+'"'
-  var field_value
+    $('tr#'+vars.id).before(this.SFormHeader(vars));
+    var count=$("input[name='id_"+vars.id+"']").val();
+    $('tr#'+vars.id).before(this.makeSubFormWidget(count,vars,values));
+}
 
-  var rows="<tr id="+SFid+"><td colspan=3><table class='makEasy' width='100%'>"+
-           "<colgroup><col width='50%'><col width='5%'><col width='45%'></colgroup>"+
-           "<tbody>";
 
-  for (index in vars.form)
-  {
-    var fData=JSON.parse(JSON.stringify(vars.form[index]));
-    //if (values)
-    //{
-    //    if (vars.values[fData.name]){fData.value=vars.values[fData.name]}
-    //}
-    field_value=values[fData.name] || fData.value
-    alert(field_value)
-    fData.name=vars.id+'['+count+']['+fData.name+']';
+meForm.makeSubFormWidget = function(sfCount,sfData,sfValues={}) //crea un sub-form o maschera annidata//
+{
+    var sfID='"'+sfData.id+sfCount+'"'
+    var field_value
+    var form_data
 
-    switch(fData.class)
+    var row="<tr id="+sfID+"><td colspan=3><table class='makEasy' width='100%'>"+
+              "<colgroup><col width='50%'><col width='5%'><col width='45%'></colgroup>"+
+              "<tbody>";
+
+    for (index in sfData.form)
     {
-     case 'list':
-       rows += this.editList(fData,field_value);
-       break;
-     case 'number':
-       rows += this.editNumber(fData,field_value);
-       break;
-     case 'multiple-subform':
-       rows += this.makeMSForm(fData);
-       break;
-     default:
-       rows += '';
+        form_data=JSON.parse(JSON.stringify(sfData.form[index]));
+        field_value=sfValues[form_data.name] || form_data.value
+        form_data.name=sfData.id+'['+sfCount+']['+form_data.name+']';
+        row += this.makeFormWidget(form_data,field_value);
     }
-  }
-  rows += '</body></table></td></tr>';
-  $('tr#'+vars.id).before(rows);
 
+    row += '</body></table></td></tr>';
+    return row
+}
+
+
+meForm.makeFormWidget= function(fwData,fwValues)
+{
+    var row=''
+    switch(fwData.class)
+    {
+        case 'list':
+            row=meForm.editList(fwData,fwValues);
+            break;
+        case 'number':
+            row=meForm.editNumber(fwData,fwValues);
+            break;
+        case 'multiple-subform':
+            row=meForm.makeMSForm(fwData,fwValues);
+
+                //      if (values[pForm.id].length>0)
+                //          {
+                //              var vForm=values[pForm.id]
+                //              for (fIndex in vForm)
+                //              {
+                //               pForm.values=vForm[fIndex]
+                //               meForm.addSForm(pForm,vForm[fIndex]);
+                //              }
+
+                //          }
+
+            break;
+        case 'switch-fields':
+            row=meForm.editSwitchFields(fwData,fwValues);
+            // fname=pForm.name+':number'
+            break;
+        default:
+            var row='';
+    }
+    return row
 }
 
 
@@ -254,7 +276,7 @@ meForm.makeTableFields = function(vars) //crea subform a tabella
 }
 
 
-meForm.makeMSForm = function(vars)
+meForm.makeMSForm = function(vars,msValues)
 {
   var vars = vars || {};
   var row_id = vars.id || '';
@@ -270,6 +292,8 @@ meForm.makeMSForm = function(vars)
   row += "onclick='meForm.addSForm("+JSON.stringify(vars)+")'"
   row += ' >';
   row += vars.add_button.label+'</a><input name="id_'+vars.id+'" type="hidden" value="-1"></td></tr>';
+
+  // inserire codice per aggiunta campi da msValues
   return row
 }
 
