@@ -96,16 +96,22 @@ meForm.editNumber = function(vars,value=0)
   }
 
 
-meForm.SFormHeader = function(vars)
- {
-  count=$("input[name='id_"+vars.id+"']").val();
-  count++;
-  $("input[name='id_"+vars.id+"']").val(count);
-
-  var SFid='"'+vars.id+count+'"'
-  var row='<tr id="header_'+vars.id+count+'"><th>'+vars.label+' n° '+(count+1)+'</th>'
-  row +=  "<th class='expand' id='"+vars.id+count+"' onclick='meForm.expand("+SFid+")'>-</th></tr>";
-  return row
+meForm.makeSubFormHeader = function(sfId,sfCount,sfLabel,sfCallBack)
+{
+    row='<tr id="header_'+sfId+sfCount+'"><th>'+sfLabel+' n° '+(parseInt(sfCount)+1).toString()+'</th>'
+    row+="<th class='expand' status='on' id='"+sfId+sfCount+"'>"
+    row+=this.makeIcon(
+                        "glyphicon-collapse-up",
+                        "meForm.expandSubForm('"+sfId+sfCount+"')",
+                        "id='"+sfId+sfCount+"'"
+                       )
+    row+="<span>&nbsp</span>"
+    row+=this.makeIcon(
+                        "glyphicon-remove",
+                        "meForm.deleteSubForm('"+sfId+sfCount+"',"+sfCallBack+")"
+                      )
+    row+="</th></tr>"
+    return row
 }
 
 
@@ -157,9 +163,12 @@ meForm.makeSubForm = function (vars)// sub-form singolo - da sistemare!!!!!
 
 meForm.addSForm = function(vars,values={}) //aggiunge un sub-form o maschera annidata//
 {
-    $('tr#'+vars.id).before(this.SFormHeader(vars));
     var count=$("input[name='id_"+vars.id+"']").val();
-    // caricare values
+    count++;
+    $("input[name='id_"+vars.id+"']").val(count);
+
+    $('tr#'+vars.id).before(this.makeSubFormHeader(vars.id,count,vars.label,vars.after_deletion_callback));
+
     for(index in vars.form){values[vars.form[index].name]=vars.form[index].value}
     $('tr#'+vars.id).before(this.makeSubFormWidget(vars.id,count,vars.form,values));
 }
@@ -253,7 +262,7 @@ meForm.makeTableFields = function(vars) //crea subform a tabella
       {
           row+='<a onclick='+buttons[i].onclick+
                ' id="'+vars.id+'_button_'+buttons[i].id+'"'+
-               ' class="button" data-w2p_disable_with="default">'+buttons[i].label
+               ' class="button">'+buttons[i].label
           row+='</a><span> </span>'
       }
   }
@@ -271,19 +280,36 @@ meForm.makeMSForm = function(vars,msName,msValues)
     var args = vars.add_button.args || {};
     var row=''
     var countForm="-1"
+    var count=0
 
 
     if (msValues)
     {
-        countForm=(msValues.length -1).toString()
         for (fIndex in msValues)
         {
-            var sfId='"'+vars.id+fIndex+'"'
-            var sfForm=JSON.parse(JSON.stringify(vars.form));
-            row+='<tr id="header_'+vars.id+fIndex+'"><th>'+vars.label+' n° '+(parseInt(fIndex)+1).toString()+'</th>'
-            row+="<th class='expand' id='"+vars.id+fIndex+"' onclick='meForm.expand("+sfId+")'>-</th></tr>";
-            row+=this.makeSubFormWidget(vars.id,fIndex,vars.form,msValues[fIndex]);
+            if (msValues[fIndex])
+            {
+                var sfId='"'+vars.id+count+'"'
+                var sfForm=JSON.parse(JSON.stringify(vars.form));
+                row+='<tr id="header_'+vars.id+count+'"><th>'+vars.label+' n° '+(parseInt(count)+1).toString()+'</th>'
+                row+="<th class='expand' status='on' id='"+vars.id+count+"'>"
+                row+=this.makeIcon(
+                                    "glyphicon-collapse-up",
+                                    "meForm.expandSubForm("+sfId+")",
+                                    "id='"+vars.id+count+"'"
+                                   )
+                row+="<span>&nbsp</span>"
+                row+=this.makeIcon(
+                                    "glyphicon-remove",
+                                    "meForm.deleteSubForm("+sfId+","+vars.after_deletion_callback+")"
+                                  )
+
+                row+="</th></tr>"
+                row+=this.makeSubFormWidget(vars.id,count,vars.form,msValues[fIndex]);
+                count=count+1;
+            }
         }
+        countForm=(count-1).toString()
     }
 
     row+='<tr id='+row_id+'>'+
@@ -297,25 +323,45 @@ meForm.makeMSForm = function(vars,msName,msValues)
     row += ' >';
     row += vars.add_button.label+'</a><input name="id_'+vars.id+'" type="hidden" value='+countForm+'></td></tr>';
 
-
     return row
 }
 
 
-meForm.expand = function(sform) //espande un form nascosto//
- {
-     if ($('th[id="'+sform+'"]').text()=='-')
-     {
-      $('tr[id="'+sform+'"]').fadeOut();
-      $('th[id="'+sform+'"]').text('+');
-     }
-     else
-     {
-      $('tr[id="'+sform+'"]').fadeIn();
-      $('th[id="'+sform+'"]').text('-');
-     }
-    }
+meForm.expandSubForm = function(sform) //espande e contrae un form multiplo //
+{
+    var tag='[id="'+sform+'"]'
 
+    if ($('th'+tag).attr('status')=='on')
+    {
+     $('tr'+tag).fadeOut();
+     $('th'+tag).attr('status','off');
+     $('span'+tag).attr('class','glyphicon glyphicon-collapse-down');
+    }
+    else
+    {
+     $('tr'+tag).fadeIn();
+     $('th'+tag).attr('status','on');
+     $('span'+tag).attr('class','glyphicon glyphicon-collapse-up');
+    }
+}
+
+
+meForm.deleteSubForm = function(sForm,afterDel) //elimina un form multiplo //
+{
+    $('tr[id="'+sForm+'"]').fadeOut();
+    $('tr[id="'+sForm+'"]').remove();
+    $('tr[id="header_'+sForm+'"]').fadeOut();
+    $('tr[id="header_'+sForm+'"]').remove();
+    afterDel();
+}
+
+
+
+meForm.makeIcon = function (ibName,iOnClick,iArgs)
+{
+    row="<span class='glyphicon "+ibName+"' "+iArgs+" style='display:inline;' onclick="+iOnClick+"></span>"
+    return row
+}
 
 meForm.deployTable = function (vars)
 {

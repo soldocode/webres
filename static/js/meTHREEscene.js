@@ -74,43 +74,7 @@ function onMouseMove( event )
 
 
     detection_in_progress=false;
-    //if (raycasterWorking==false)
-    //{
-    //raycasterWorking=true;
-	//raycaster.setFromCamera( mouse, camera );
-    //intersection = raycaster.intersectObjects(scene.children,true);
-    //if (intersection.length!=0)
-    //    {
-    //        console.log('on')
-    //        console.log(objSelection[0].material)
-     //       for (obj in objSelection)
-    //          {
-    //              if (obj.object!=null)
-    //               {
-    //                   console.log('sco');
-    //                   console.log(obj.object.material.color);
-    //                   obj.object.material=material1
-    //               }
-    //          }
 
-    //        objSelection=[{}]
-    //        objSelection[0].material=intersection[0].object.material;
-    //        objSelection[0].object=intersection[0].object;
-    //        intersection[0].object.material=selectedLine;
-    //        console.log( objSelection[0].material.color);
-    //        raycasterWorking=false;
-    //    }
-    //else{
-    //      for (obj in objSelection)
-    //          {
-    //              console.log('off');
-    //              if (obj.object){obj.object.material=material2}
-    //          }
-    //       objSelection=[{}]
-    //       raycasterWorking=false;
-
-    //    }
-    //}
 }
 
 window.addEventListener( 'mousemove', onMouseMove, false );

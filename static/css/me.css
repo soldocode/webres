@@ -4,12 +4,17 @@
       overflow: auto;
       overflow-x: hidden;
       float:left;
-      display:block; 
+      display:block;
       width:30%;
-      z-index:3; 
-      height:90%; 
+      z-index:3;
+      height:90%;
       position:absolute;
       }
+
+a,u
+{
+    text-decoration: none !important;
+}
 
 canvas
 {
@@ -26,7 +31,7 @@ body
  color:#2B2C2C;
  font-family: Open Sans, Sans-serif;
  font-weight: 100;
- font-size: 15px	
+ font-size: 15px
 }
 
 div.header
@@ -38,7 +43,7 @@ div.header
 div.content
 {
  margin: 5px;
- background-color:  #F0F0F0; 
+ background-color:  #F0F0F0;
 }
 
 h1
@@ -71,9 +76,9 @@ input,select
  /*background-color: #647070;*/
 }
 
-select, textarea, input[type="text"], input[type="password"], input[type="datetime"], 
-input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], 
-input[type="week"], input[type="number"], input[type="email"], input[type="url"], 
+select, textarea, input[type="text"], input[type="password"], input[type="datetime"],
+input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"],
+input[type="week"], input[type="number"], input[type="email"], input[type="url"],
 input[type="search"], input[type="tel"], input[type="color"]
 {
 width:auto;
@@ -185,10 +190,21 @@ button:hover,a.button:hover
 
 #dbmanage th.expand:hover
 {
- color:#ffffff;
+ /*color:#ffffff;*/
  cursor:pointer;
+ text-decoration-line:none;
 }
 
+#dbmanage span.glyphicon
+{
+  color:#cccccc;
+  text-decoration:none;
+}
+
+#dbmanage span.glyphicon:hover
+{
+  color:#ffffff;
+}
 
 
 /* formattazione table makEasy */
@@ -286,7 +302,7 @@ ul.meTabs li
 
 ul.meTabs li:hover , ul.meTabs li[status="active"]
 {
- padding-bottom:7px; 
+ padding-bottom:7px;
 }
 
 ul.meTabs li:active, ul.meTabs li[status="active"]
@@ -322,7 +338,7 @@ ul#menu li
 ul#menu li a
 {
  padding-bottom:8px;
- 
+
 }
 
 ul#menu li a:hover
@@ -346,12 +362,12 @@ ul#menu ul{
     z-index:9999;
     /*background:#333333;*/
 }
- 
+
 ul#menu li:hover > ul {
     opacity:1;
     visibility:visible;
 }
- 
+
 ul#menu ul li {
     float:none;
     display:block;

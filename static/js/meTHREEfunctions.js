@@ -85,7 +85,7 @@ function make_circle(diameter)
      var radius = diameter/2;
      var shape = new THREE.Shape();
      shape.moveTo( Math.cos(0) * radius,Math.sin(0) * radius );
-     for (var i = 1; i <= segmentCount; i++) 
+     for (var i = 1; i <= segmentCount; i++)
        {
         var theta = (i / segmentCount) * Math.PI * 2;
         shape.lineTo( Math.cos(theta) * radius,Math.sin(theta) * radius  );
