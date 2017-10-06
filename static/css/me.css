@@ -273,12 +273,11 @@ ul#menu li
 ul#menu li a
 {
  padding-bottom:8px;
-
+ color:#D6D6D6;
 }
 
 ul#menu li a:hover
 {
- /*background:#333333;*/
  color:#ffffff;
  cursor:pointer;
 }
