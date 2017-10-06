@@ -4,7 +4,7 @@
 // TODO: tutto da sistemare!!     //
 
 
-var meForm={LastUpdate:'10-09-2017'};
+var meForm={LastUpdate:'16-09-2017'};
 
 
 //meForm.editList
@@ -94,6 +94,31 @@ meForm.editNumber = function(vars,value=0)
 
     return row
   }
+
+
+meForm.selectJsonList = function(vars,value=-1)
+{
+    var vars = vars || {};
+    var label = vars.label || '';
+    var value = String(value);
+    var name = vars.name || '';
+    var options = vars.values || {};
+    var size = vars.size || 'auto';
+    var args = vars.args || {};
+
+    var form_name='"'+name+':number" '
+    var row='<tr id='+form_name+'>'+
+            '<th colspan="2" id='+form_name+'>'+label+'</th>'+
+            '<td>'+
+            '<select name='+form_name+' ';
+    for  (arg in args)
+    {
+        row +=arg+"='"+args[arg]+"'";
+    }
+    row += ' >';
+    row +='</select></td></tr>';
+    return row
+}
 
 
 meForm.makeSubFormHeader = function(sfId,sfCount,sfLabel,sfCallBack)
@@ -195,6 +220,8 @@ meForm.makeFormWidget = function(fwData,fwValues)
             case 'switch-fields':
                 row+=this.editSwitchFields(data,fwValues[data.name]);
                 break;
+            case 'json-list':
+                row+=this.selectJsonList(data,fwValues[data.name]);
         }
     }
     return row
@@ -313,7 +340,7 @@ meForm.makeMSForm = function(vars,msName,msValues)
     }
 
     row+='<tr id='+row_id+'>'+
-          '<td style="padding-top:10px">'+
+          '<td colspan="2" style="padding-top:10px;" >'+
           '<a class="button"'
     for  (arg in args)
     {
@@ -432,6 +459,7 @@ meForm.deployTable = function (vars)
       }
 }
 
+
 meForm.editRowTable= function (vars)
 {
   var vars = vars || {};
@@ -444,7 +472,20 @@ meForm.editRowTable= function (vars)
 }
 
 
-meForm.deployForm = function (form_title,form_data,idForm) //dispiega form leggendo struttura json//
+meForm.deployForm= function (title,id)
+{
+    $("h2#title").text(title);
+    $("table#"+id+" tbody").html('<tr>');
+
+    var fData=JSON.parse(localStorage.form_data)
+    var pValues=JSON.parse(localStorage.prj_data);
+    $('#'+id+' tr:last').before(meForm.makeFormWidget(fData,pValues))
+
+    $('#'+id).on("change",function(){update_all()})
+}
+
+
+meForm.deployForm_old = function (form_title,form_data,idForm) //dispiega form leggendo struttura json// da eliminare!!!!!!
 {
       $("h2#title").text(form_title);
       var data
