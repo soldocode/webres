@@ -121,6 +121,23 @@ meForm.selectJsonList = function(vars,value=-1)
 }
 
 
+meForm.getJson = function (urlPath,jsonPath)
+{
+     $.ajax(
+        {
+           url: urlPath,
+           type: "POST",
+           data: {'jsonPath':jsonPath},
+           dataType: "json",
+           success:function(result)
+                    {
+                        alert(JSON.stringify(result));
+                    }
+
+        })
+}
+
+
 meForm.makeSubFormHeader = function(sfId,sfCount,sfLabel,sfCallBack)
 {
     row='<tr id="header_'+sfId+sfCount+'"><th>'+sfLabel+' n° '+(parseInt(sfCount)+1).toString()+'</th>'
@@ -383,6 +400,26 @@ meForm.deleteSubForm = function(sForm,afterDel) //elimina un form multiplo //
 }
 
 
+meForm.deployForm= function (title,id)
+{
+
+    $("h2#title").text(title);
+    $("table#"+id+" tbody").html('<tr>');
+
+    var fData=JSON.parse(localStorage.form_data)
+    var pValues=JSON.parse(localStorage.prj_data);
+    $('#'+id+' tr:last').before(meForm.makeFormWidget(fData,pValues))
+
+    $('#'+id).on("change",function(){update_all()})
+    this.afterDeployForm()
+}
+
+
+meForm.afterDeployForm= function()
+{
+
+}
+
 
 meForm.makeIcon = function (ibName,iOnClick,iArgs)
 {
@@ -471,18 +508,6 @@ meForm.editRowTable= function (vars)
   $('table#'+tid).append(html);
 }
 
-
-meForm.deployForm= function (title,id)
-{
-    $("h2#title").text(title);
-    $("table#"+id+" tbody").html('<tr>');
-
-    var fData=JSON.parse(localStorage.form_data)
-    var pValues=JSON.parse(localStorage.prj_data);
-    $('#'+id+' tr:last').before(meForm.makeFormWidget(fData,pValues))
-
-    $('#'+id).on("change",function(){update_all()})
-}
 
 
 meForm.deployForm_old = function (form_title,form_data,idForm) //dispiega form leggendo struttura json// da eliminare!!!!!!
