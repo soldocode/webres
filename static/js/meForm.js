@@ -400,15 +400,15 @@ meForm.deleteSubForm = function(sForm,afterDel) //elimina un form multiplo //
 }
 
 
-meForm.deployForm= function (title,id)
+meForm.deployForm= function (id,title,form,data)
 {
 
     $("h2#title").text(title);
     $("table#"+id+" tbody").html('<tr>');
 
-    var fData=JSON.parse(localStorage.form_data)
-    var pValues=JSON.parse(localStorage.prj_data);
-    $('#'+id+' tr:last').before(meForm.makeFormWidget(fData,pValues))
+    //var fData=JSON.parse(localStorage.form_data)
+    //var pValues=JSON.parse(localStorage.prj_data);
+    $('#'+id+' tr:last').before(meForm.makeFormWidget(form,data))
 
     $('#'+id).on("change",function(){update_all()})
     this.afterDeployForm()
