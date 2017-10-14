@@ -19,8 +19,9 @@ meForm.editList = function(vars,v=-1)
     var options = vars.values || {};
     var size = vars.size || 'auto';
     var args = vars.args || {};
+    var type = vars.type || 'number'
 
-    var form_name='"'+name+':number" '
+    var form_name='"'+name+':'+type+'" '
     var row='<tr id='+form_name+'>'+
             '<th colspan="2" id='+form_name+'>'+label+'</th>'+
             '<td>'+

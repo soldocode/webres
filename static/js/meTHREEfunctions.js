@@ -26,7 +26,7 @@ function make_rect_path(length,width)
 
 function make_circle_path(diameter)
    {
-     var segmentCount = 36;
+     var segmentCount = 48;
      var radius = diameter/2;
      var path =[];
      for (var i = 0; i < segmentCount; i++)
@@ -42,7 +42,7 @@ function make_circle_path(diameter)
 
 function make_hole_path(diameter,x,y)
     {
-     var segmentCount = 24;
+     var segmentCount = 36;
      var radius = diameter/2;
      var hpath =[];
      for (var i = 0; i < segmentCount; i++)
@@ -81,7 +81,7 @@ function make_rect(length,width)
 
 function make_circle(diameter)
    {
-     var segmentCount = 36;
+     var segmentCount = 48;
      var radius = diameter/2;
      var shape = new THREE.Shape();
      shape.moveTo( Math.cos(0) * radius,Math.sin(0) * radius );
@@ -96,7 +96,7 @@ function make_circle(diameter)
 
 function make_hole(diameter,x,y)
     {
-     var segmentCount = 24;
+     var segmentCount = 36;
      var radius = diameter/2;
      var hpath = new THREE.Path();
      hpath.moveTo(x + Math.sin(0) * radius,y + Math.cos(0) * radius );
