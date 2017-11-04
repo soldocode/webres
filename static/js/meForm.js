@@ -5,10 +5,36 @@
 
 
 var meForm={LastUpdate:'16-09-2017'};
+meForm.Widget={}
 
 
 //meForm.editList
 //make select from list
+
+
+meForm.hiddenField = function(vars,values='vuoto')
+{
+    var vars = vars || {};
+    var label = vars.label || '';
+    var name = vars.name || '';
+    var width = vars.width || 'auto';
+    //var onchange = vars.onchange || ''
+    var args = vars.args || {};
+    //var style = args.style || '';
+    var form_name='"'+name+':string" '
+    var row='<tr id='+form_name
+    for (arg in args) {row+=' '+arg+'="'+args[arg]+'"'}
+    row+='>'+
+         '<th colspan="2" id='+form_name+'>'+label+'</th>'+
+         '<td>'+
+         '<input class="number value"'+
+         'name='+form_name+
+         ' id='+form_name+' value='+values+
+         ' type="string" '+
+         ' style="width:'+width+'%" >'+
+         '</input></td></tr>';
+    return row
+}
 
 meForm.editList = function(vars,v=-1)
   {
@@ -241,6 +267,11 @@ meForm.makeFormWidget = function(fwData,fwValues)
             case 'json-list':
                 row+=this.selectJsonList(data,fwValues[data.name]);
         }
+        if (this.Widget.hasOwnProperty(data.class))
+        {   console.log(data)
+            console.log(fwValues)
+            row+=this.Widget[data.class](data,fwValues[data.name])}
+
     }
     return row
 }
@@ -510,7 +541,7 @@ meForm.editRowTable= function (vars)
 }
 
 
-
+/*
 meForm.deployForm_old = function (form_title,form_data,idForm) //dispiega form leggendo struttura json// da eliminare!!!!!!
 {
       $("h2#title").text(form_title);
@@ -560,7 +591,7 @@ meForm.deployForm_old = function (form_title,form_data,idForm) //dispiega form l
           }
 
     }
-
+*/
 
 meForm.TR_BUTTONS = function(trId,btns,colspan)
 //////////////////////////////////////////////
@@ -593,6 +624,54 @@ meForm.addTableRowButton = function(label,id,colspan)/// da eliminare!!!
     return html
 }
 
+
+// make editing field for holes
+meForm.editHole = function(vars,json_values)
+{
+    row=meForm.hiddenField(vars,json_values)
+    values=JSON.parse(json_values)
+
+    tname=vars["name"].slice(0,-1)+"_type]"
+    fchange="meForm.updateHoleField(&quot;"+vars.name+"&quot;)"
+    tvars={
+          "class": "list",
+          "label": "tipo foro",
+          "name": tname,
+          "value":"1",
+          "width": 50,
+          "args": {"onchange":fchange},
+          "values": [
+            {"text": "Grezzo a Plasma", "value": "1"},
+            {"text": "Ricavato a Trapano","value": "2"},
+            {"text": "Filettato","value": "3"},
+            {"text": "Svasato","value": "4"}
+          ]
+        }
+
+    //tvars["name"]=vars["name"].slice(0,-1)+"_type]"
+    row+=meForm.editList(tvars,values.type)
+
+    dvars={
+          "class": "number",
+          "label": "Ø foro",
+          "value": 0,
+          "width": 40,
+          "name": "dia",
+          "args": {"onchange":fchange}
+          }
+
+    dvars["name"]=vars["name"].slice(0,-1)+"_dia]"
+    row+=meForm.editNumber(dvars,values.dia)
+
+    return row
+}
+
+meForm.updateHoleField=function(){alert('funge')}
+
+meForm.Widget['hole']=meForm.editHole
+
+
+//---------------------------------------------MENU FUNCTION----------------------------------------//
 
 meForm.loadMenu=function(menu) {this.menu=menu;}
 
