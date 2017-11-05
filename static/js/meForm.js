@@ -1,7 +1,7 @@
 // meForm - JavaScript Module     //
 // Riccardo Soldini  2015-2017    //
 // 							      //
-// TODO: tutto da sistemare!!     //
+
 
 
 var meForm={LastUpdate:'16-09-2017'};
@@ -27,7 +27,7 @@ meForm.hiddenField = function(vars,values='vuoto')
     row+='>'+
          '<th colspan="2" id='+form_name+'>'+label+'</th>'+
          '<td>'+
-         '<input class="number value"'+
+         '<input class="value"'+
          'name='+form_name+
          ' id='+form_name+' value='+values+
          ' type="string" '+
@@ -387,7 +387,6 @@ meForm.makeMSForm = function(vars,msName,msValues)
         }
         countForm=(count-1).toString()
     }
-
     row+='<tr id='+row_id+'>'+
           '<td colspan="2" style="padding-top:10px;" >'+
           '<a class="button"'
@@ -398,7 +397,6 @@ meForm.makeMSForm = function(vars,msName,msValues)
     row += "onclick='meForm.addSForm("+JSON.stringify(vars)+")'"
     row += ' >';
     row += vars.add_button.label+'</a><input name="id_'+vars.id+'" type="hidden" value='+countForm+'></td></tr>';
-
     return row
 }
 
@@ -406,7 +404,6 @@ meForm.makeMSForm = function(vars,msName,msValues)
 meForm.expandSubForm = function(sform) //espande e contrae un form multiplo //
 {
     var tag='[id="'+sform+'"]'
-
     if ($('th'+tag).attr('status')=='on')
     {
      $('tr'+tag).fadeOut();
@@ -434,14 +431,9 @@ meForm.deleteSubForm = function(sForm,afterDel) //elimina un form multiplo //
 
 meForm.deployForm= function (id,title,form,data)
 {
-
     $("h2#title").text(title);
     $("table#"+id+" tbody").html('<tr>');
-
-    //var fData=JSON.parse(localStorage.form_data)
-    //var pValues=JSON.parse(localStorage.prj_data);
     $('#'+id+' tr:last').before(meForm.makeFormWidget(form,data))
-
     $('#'+id).on("change",function(){update_all()})
     this.afterDeployForm()
 }
@@ -458,6 +450,7 @@ meForm.makeIcon = function (ibName,iOnClick,iArgs)
     row="<span class='glyphicon "+ibName+"' "+iArgs+" style='display:inline;' onclick="+iOnClick+"></span>"
     return row
 }
+
 
 meForm.deployTable = function (vars)
 {
@@ -601,7 +594,6 @@ meForm.TR_BUTTONS = function(trId,btns,colspan)
 //                  "arg":"arg"}
 //      }
 //////////////////////////////////////////////
-
 {
 	html='<tr class="buttons"><td colspan='+colspan+'>';
 	for (btn in btns)
@@ -624,22 +616,22 @@ meForm.addTableRowButton = function(label,id,colspan)/// da eliminare!!!
     return html
 }
 
-
-// make editing field for holes
-meForm.editHole = function(vars,json_values)
+meForm.Hole={}
+meForm.Hole.makeEditField=function(pars,vals)
 {
-    row=meForm.hiddenField(vars,json_values)
-    values=JSON.parse(json_values)
+    row=meForm.hiddenField(pars,vals)
+    values=JSON.parse(vals)
 
-    tname=vars["name"].slice(0,-1)+"_type]"
-    fchange="meForm.updateHoleField(&quot;"+vars.name+"&quot;)"
-    tvars={
+    tname=pars.name.slice(0,-1)+"_type]"
+    f_type_change="meForm.Hole.updateDiaField(&quot;"+pars.name+"&quot;)"
+    f_dia_change="meForm.Hole.updateField(&quot;"+pars.name+"&quot;)"
+    tpars={
           "class": "list",
           "label": "tipo foro",
           "name": tname,
           "value":"1",
           "width": 50,
-          "args": {"onchange":fchange},
+          "args": {"onchange":f_type_change},
           "values": [
             {"text": "Grezzo a Plasma", "value": "1"},
             {"text": "Ricavato a Trapano","value": "2"},
@@ -648,27 +640,238 @@ meForm.editHole = function(vars,json_values)
           ]
         }
 
-    //tvars["name"]=vars["name"].slice(0,-1)+"_type]"
-    row+=meForm.editList(tvars,values.type)
+    row+=meForm.editList(tpars,values.type)
 
-    dvars={
-          "class": "number",
-          "label": "Ø foro",
-          "value": 0,
-          "width": 40,
-          "name": "dia",
-          "args": {"onchange":fchange}
-          }
-
-    dvars["name"]=vars["name"].slice(0,-1)+"_dia]"
-    row+=meForm.editNumber(dvars,values.dia)
-
+    switch(values.type)
+    {
+        case '1':
+            dvars=meForm.Hole.Types['1']
+            dvars.name=pars["name"].slice(0,-1)+"_dia]"
+            dvars["args"]={"onchange":f_dia_change}
+            row+=meForm.editNumber(dvars,values.dia)
+            break;
+        case '2':
+            dvars=meForm.Hole.Types['2']
+            dvars["name"]=pars["name"].slice(0,-1)+"_dia]"
+            dvars["args"]={"onchange":f_dia_change}
+            row+=meForm.editList(dvars,values.dia)
+            break;
+        case '3':
+            dvars=meForm.Hole.Types['3']
+            dvars["name"]=pars["name"].slice(0,-1)+"_dia]"
+            dvars["args"]={"onchange":f_dia_change}
+            row+=meForm.editList(dvars,values.dia)
+            break;
+        case '4':
+            dvars=meForm.Hole.Types['4']
+            dvars["name"]=pars["name"].slice(0,-1)+"_dia]"
+            dvars["args"]={"onchange":f_dia_change}
+            row+=meForm.editList(dvars,values.dia)
+            break;
+    }
     return row
 }
 
-meForm.updateHoleField=function(){alert('funge')}
+meForm.Hole.Types=
+{   '1':
+    {
+        "class": "number",
+        "label": "Ø foro",
+        "value": 0,
+        "width": 40,
+        "name": "dia"
+    },
+    '2':
+    {
+        "class": "list",
+        "label": "Ø foro",
+        "value": 5,
+        "width": 40,
+        "name": "dia",
+        "values":[{"text":"1,75","value":1.75},
+                  {"text":"2,5","value":2.5},
+                  {"text":"3,3","value":3.3},
+                  {"text":"4,2","value":4.2},
+                  {"text":"5","value":5},
+                  {"text":"5,25","value":5.25},
+                  {"text":"6","value":6},
+                  {"text":"6,5","value":6.5},
+                  {"text":"7","value":7},
+                  {"text":"7.5","value":7.5},
+                  {"text":"8","value":8},
+                  {"text":"8,5","value":8.5},
+                  {"text":"9","value":9},
+                  {"text":"9.5","value":9.5},
+                  {"text":"10","value":10},
+                  {"text":"10,25","value":10.5},
+                  {"text":"11","value":11},
+                  {"text":"12","value":12},
+                  {"text":"12,5","value":12.5},
+                  {"text":"13","value":13},
+                  {"text":"14","value":14},
+                  {"text":"15","value":15},
+                  {"text":"16","value":16},
+                  {"text":"17","value":17},
+                  {"text":"18","value":18},
+                  {"text":"19","value":19},
+                  {"text":"20","value":20},
+                  {"text":"21","value":21},
+                  {"text":"23","value":23},
+                  {"text":"25","value":25},
+                  {"text":"27","value":27},
+                  {"text":"30","value":30},
+                  {"text":"31","value":31},
+                  {"text":"35","value":35},
+                  {"text":"40","value":40},
+                  {"text":"50","value":50}]
+    },
+    '3':
+    {
+        "class": "list",
+        "label": "Ø filetto",
+        "value": 5,
+        "width": 40,
+        "name": "dia",
+        "values":[{"text":"3 MA","value":3},
+                  {"text":"4 MA","value":4},
+                  {"text":"5 MA","value":5},
+                  {"text":"6 MA","value":6},
+                  {"text":"8 MA","value":8},
+                  {"text":"10 MA","value":10},
+                  {"text":"12 MA","value":12},
+                  {"text":"14 MA","value":14},
+                  {"text":"16 MA","value":16},
+                  {"text":"18 MA","value":18},
+                  {"text":"20 MA","value":20},
+                  {"text":"22 MA","value":22},
+                  {"text":"24 MA","value":24},
+                  {"text":"27 MA","value":27},
+                  {"text":"30 MA","value":30},
+                  {"text":"1&quot; GAS","value":30}]
+    },
+    '4':
+    {
+        "class": "list",
+        "label": "vite svasata",
+        "value": 5,
+        "width": 40,
+        "name": "dia",
+        "values":[{"text":"4 MA","value":4},
+                  {"text":"5 MA","value":5},
+                  {"text":"6 MA","value":6},
+                  {"text":"8 MA","value":8},
+                  {"text":"10 MA","value":10},
+                  {"text":"12 MA","value":12},
+                  {"text":"14 MA","value":14},
+                  {"text":"16 MA","value":16},
+                  {"text":"18 MA","value":18},
+                  {"text":"20 MA","value":20},
+                  {"text":"22 MA","value":22},
+                  {"text":"24 MA","value":24},
+                  {"text":"27 MA","value":27},
+                  {"text":"30 MA","value":30}]
+    }
+}
 
-meForm.Widget['hole']=meForm.editHole
+
+meForm.Hole.updateDiaField_old=function(name)
+{
+    name_hidden="input[name='"+name+":string'"
+    name_type="select[name='"+name.slice(0,-1)+"_type]:number'"
+    name_replace="tr[id='"+name.slice(0,-1)+"_dia]:number'"
+    f_dia_change="meForm.Hole.updateField(&quot;"+name+"&quot;)"
+    new_values={'type':$(name_type).val()}
+
+    name_dia="input[name='"+name.slice(0,-1)+"_dia]:number'"
+    new_values.dia=$(name_dia).val()
+    if (new_values.dia==undefined)
+    {
+        name_dia="select[name='"+name.slice(0,-1)+"_dia]:number'"
+        new_values.dia=$(name_dia).val()
+    }
+    $(name_hidden).val(JSON.stringify(new_values));
+
+    switch(new_values.type)
+    {
+        case '1':
+            dvars=meForm.Hole.Types['1']
+            dvars.name=name_dia
+            dvars["args"]={"onchange":f_dia_change}
+            row=meForm.editNumber(dvars,new_values.dia)
+            break;
+        case '2':
+            dvars=meForm.Hole.Types['2']
+            dvars.name=name_dia
+            dvars["args"]={"onchange":f_dia_change}
+            row=meForm.editList(dvars,new_values.dia)
+            break;
+        case '3':
+            dvars=meForm.Hole.Types['3']
+            dvars.name=name_dia
+            dvars["args"]={"onchange":f_dia_change}
+            row=meForm.editList(dvars,new_values.dia)
+            break;
+        case '4':
+            dvars=meForm.Hole.Types['4']
+            dvars.name=name_dia
+            dvars["args"]={"onchange":f_dia_change}
+            row=meForm.editList(dvars,new_values.dia)
+            break;
+    }
+    //console.log(row)
+    $(name_replace).replaceWith(row)
+    $(name_hidden).val(JSON.stringify(new_values));
+}
+
+
+meForm.Hole.updateDiaField=function(name)
+{
+    var name_hidden="input[name='"+name+":string'"
+    var name_type="select[name='"+name.slice(0,-1)+"_type]:number'"
+    var del_type="tr[id='"+name.slice(0,-1)+"_type]:number'"
+    var name_replace="tr[id='"+name.slice(0,-1)+"]:string'"
+    var new_values={'type':$(name_type).val()}
+
+    var name_dia="input[name='"+name.slice(0,-1)+"_dia]:number'"
+    var del_dia="tr[id='"+name.slice(0,-1)+"_dia]:number'"
+    new_values.dia=$(name_dia).val()
+    if (new_values.dia==undefined)
+    {
+        name_dia="select[name='"+name.slice(0,-1)+"_dia]:number'"
+        del_dia="tr[id='"+name.slice(0,-1)+"_dia]:number'"
+        new_values.dia=$(name_dia).val()
+    }
+
+    var json_values=JSON.stringify(new_values)
+    console.log(json_values)
+    console.log(name_replace)
+    var pars={
+        "class":"hole",
+        "name":name,
+        "value":json_values
+        }
+    row=meForm.Hole.makeEditField(pars,json_values)
+
+    $(del_type).remove();
+    $(del_dia).remove();
+    $(name_replace).replaceWith(row);
+}
+
+meForm.Hole.updateField=function(name)
+{
+    name_hidden="input[name='"+name+":string'"
+    name_type="select[name='"+name.slice(0,-1)+"_type]:number'"
+
+    new_values={'type':$(name_type).val()}
+    if (new_values.type=='1')
+    {name_dia="input[name='"+name.slice(0,-1)+"_dia]:number'"}
+    else
+    {name_dia="select[name='"+name.slice(0,-1)+"_dia]:number'"}
+    new_values.dia=$(name_dia).val()
+    $(name_hidden).val(JSON.stringify(new_values));
+}
+
+meForm.Widget['hole']=meForm.Hole.makeEditField
 
 
 //---------------------------------------------MENU FUNCTION----------------------------------------//
