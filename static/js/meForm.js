@@ -4,15 +4,11 @@
 
 
 
-var meForm={LastUpdate:'16-09-2017'};
+var meForm={LastUpdate:'06-11-2017'};
 meForm.Widget={}
 
 
-//meForm.editList
-//make select from list
-
-
-meForm.hiddenField = function(vars,values='vuoto')
+meForm.hiddenField = function(vars,values='{}')
 {
     var vars = vars || {};
     var label = vars.label || '';
@@ -270,7 +266,7 @@ meForm.makeFormWidget = function(fwData,fwValues)
         if (this.Widget.hasOwnProperty(data.class))
         {   console.log(data)
             console.log(fwValues)
-            row+=this.Widget[data.class](data,fwValues[data.name])}
+            row+=this.Widget[data.class].makeEditField(data,fwValues[data.name])}
 
     }
     return row
@@ -534,58 +530,6 @@ meForm.editRowTable= function (vars)
 }
 
 
-/*
-meForm.deployForm_old = function (form_title,form_data,idForm) //dispiega form leggendo struttura json// da eliminare!!!!!!
-{
-      $("h2#title").text(form_title);
-      var data
-      $('table#'+idForm+' tbody').html('<tr>');
-
-      for (index in form_data)
-          {
-          data=form_data[index];
-          switch(data.class)
-              {
-                  case 'list':
-                      var frows=this.editList(data);
-                      $('#'+idForm+' tr:last').before(frows);
-                      break;
-                  case 'number':
-                      var frows=this.editNumber(data);
-                      $('#'+idForm+' tr:last').before(frows);
-                      break;
-                  case 'subform':
-                      var frows=this.makeSubForm(data);
-                      $('#'+idForm+' tr:last').before(frows);
-                      break;
-                  case 'multiple-subform':
-                      var frows=this.makeMSForm(data);
-                      $('#'+idForm+' tr:last').before(frows);
-                      break;
-                  case 'table-fields':
-                      var frows=this.makeTableFields(data);
-                      $('#'+idForm+' tr:last').before(frows);
-                      for (ib in data.buttons)
-                      {
-                          if (data.buttons[ib].class=="load")
-                          {
-                            ///da sistemare!!!!!!!!!!!!
-                            document.getElementById('selectfiles0').addEventListener('change',eval(data.buttons[ib].onclick), false);
-                          }
-                      }
-                      break;
-                  case 'switch-fields':
-                      var frows=this.editSwitchFields(data);
-                      $('#'+idForm+' tr:last').before(frows);
-                      break;
-                  default:
-                      var frows='';
-              }
-          }
-
-    }
-*/
-
 meForm.TR_BUTTONS = function(trId,btns,colspan)
 //////////////////////////////////////////////
 // btns:{"button1":{"title":"Button 1",
@@ -616,16 +560,86 @@ meForm.addTableRowButton = function(label,id,colspan)/// da eliminare!!!
     return html
 }
 
+
+// ---------------- meForm.SheetMaterial - widget for editing holes ---------------------
+
+meForm.SheetMaterial={MATERIALS:{}}
+meForm.SheetMaterial.makeEditField=function(pars,vals)
+{
+    var row=meForm.hiddenField(pars,vals)
+    var values=JSON.parse(vals)
+    var tname=pars.name.slice(0,-1)+"_material]"
+    var f_mat_change="meForm.SheetMaterial.updateFields(&quot;"+pars.name+"&quot;)"
+    var f_thk_change="meForm.SheetMaterial.updateValues(&quot;"+pars.name+"&quot;)"
+    var mpars={
+        "class": "list",
+        "label": "materiale",
+        "name": "material",
+        "width": 50,
+        "value": 1,
+        "type":"string",
+        "values":[],
+        "args":{"onchange":f_mat_change}
+        }
+    row+=meForm.editList(mpars,values.material)
+    var tpars={
+        "class": "list",
+        "label": "spessore",
+        "value": 5,
+        "width": 30,
+        "values":[],
+        "name": "thickness",
+        "args": {}
+        }
+    row+=meForm.editList(tpars,values.thickness)
+    return row
+}
+
+meForm.SheetMaterial.loadData= function(url,json_path)
+{
+    $.ajax(
+    {
+        url: url,
+        type: "POST",
+        data: {'jsonPath':json_path},
+        dataType: "json",
+        success:function(result)
+        {
+            meForm.SheetMaterial.MATERIALS = JSON.parse(result.source)
+        }
+    })
+}
+
+meForm.SheetMaterial.updateThicknessField=function (name) //da sistemare!!!
+{
+    var htmlOptions=" ";
+    for (var key in meForm.SheetMaterial.MATERIALS)
+    {
+        htmlOptions+="<OPTION value='"+key+"'>"+MATERIALS[key].name+"</OPTION>";
+    }
+    var replace="<SELECT name='material:string'"
+    replace +=" onchange=fill_thickness_selector() >"
+    replace +=htmlOptions
+    replace +="</SELECT>"
+    $("select[name='material:string']").replaceWith(replace);
+    $("select[name='material:string']").val(material)
+    fill_thickness_selector(material,thk);
+}
+
+
+meForm.Widget['sheet_material']=meForm.SheetMaterial
+
+// ---------------- meForm.Hole - widget for editing holes ---------------------
+
 meForm.Hole={}
 meForm.Hole.makeEditField=function(pars,vals)
 {
-    row=meForm.hiddenField(pars,vals)
-    values=JSON.parse(vals)
-
-    tname=pars.name.slice(0,-1)+"_type]"
-    f_type_change="meForm.Hole.updateDiaField(&quot;"+pars.name+"&quot;)"
-    f_dia_change="meForm.Hole.updateField(&quot;"+pars.name+"&quot;)"
-    tpars={
+    var row=meForm.hiddenField(pars,vals)
+    var values=JSON.parse(vals)
+    var tname=pars.name.slice(0,-1)+"_type]"
+    var f_type_change="meForm.Hole.updateFields(&quot;"+pars.name+"&quot;)"
+    var f_dia_change="meForm.Hole.updateValues(&quot;"+pars.name+"&quot;)"
+    var tpars={
           "class": "list",
           "label": "tipo foro",
           "name": tname,
@@ -639,9 +653,7 @@ meForm.Hole.makeEditField=function(pars,vals)
             {"text": "Svasato","value": "4"}
           ]
         }
-
     row+=meForm.editList(tpars,values.type)
-
     switch(values.type)
     {
         case '1':
@@ -774,64 +786,13 @@ meForm.Hole.Types=
 }
 
 
-meForm.Hole.updateDiaField_old=function(name)
-{
-    name_hidden="input[name='"+name+":string'"
-    name_type="select[name='"+name.slice(0,-1)+"_type]:number'"
-    name_replace="tr[id='"+name.slice(0,-1)+"_dia]:number'"
-    f_dia_change="meForm.Hole.updateField(&quot;"+name+"&quot;)"
-    new_values={'type':$(name_type).val()}
-
-    name_dia="input[name='"+name.slice(0,-1)+"_dia]:number'"
-    new_values.dia=$(name_dia).val()
-    if (new_values.dia==undefined)
-    {
-        name_dia="select[name='"+name.slice(0,-1)+"_dia]:number'"
-        new_values.dia=$(name_dia).val()
-    }
-    $(name_hidden).val(JSON.stringify(new_values));
-
-    switch(new_values.type)
-    {
-        case '1':
-            dvars=meForm.Hole.Types['1']
-            dvars.name=name_dia
-            dvars["args"]={"onchange":f_dia_change}
-            row=meForm.editNumber(dvars,new_values.dia)
-            break;
-        case '2':
-            dvars=meForm.Hole.Types['2']
-            dvars.name=name_dia
-            dvars["args"]={"onchange":f_dia_change}
-            row=meForm.editList(dvars,new_values.dia)
-            break;
-        case '3':
-            dvars=meForm.Hole.Types['3']
-            dvars.name=name_dia
-            dvars["args"]={"onchange":f_dia_change}
-            row=meForm.editList(dvars,new_values.dia)
-            break;
-        case '4':
-            dvars=meForm.Hole.Types['4']
-            dvars.name=name_dia
-            dvars["args"]={"onchange":f_dia_change}
-            row=meForm.editList(dvars,new_values.dia)
-            break;
-    }
-    //console.log(row)
-    $(name_replace).replaceWith(row)
-    $(name_hidden).val(JSON.stringify(new_values));
-}
-
-
-meForm.Hole.updateDiaField=function(name)
+meForm.Hole.updateFields=function(name)
 {
     var name_hidden="input[name='"+name+":string'"
     var name_type="select[name='"+name.slice(0,-1)+"_type]:number'"
     var del_type="tr[id='"+name.slice(0,-1)+"_type]:number'"
     var name_replace="tr[id='"+name.slice(0,-1)+"]:string'"
     var new_values={'type':$(name_type).val()}
-
     var name_dia="input[name='"+name.slice(0,-1)+"_dia]:number'"
     var del_dia="tr[id='"+name.slice(0,-1)+"_dia]:number'"
     new_values.dia=$(name_dia).val()
@@ -841,7 +802,6 @@ meForm.Hole.updateDiaField=function(name)
         del_dia="tr[id='"+name.slice(0,-1)+"_dia]:number'"
         new_values.dia=$(name_dia).val()
     }
-
     var json_values=JSON.stringify(new_values)
     console.log(json_values)
     console.log(name_replace)
@@ -851,18 +811,16 @@ meForm.Hole.updateDiaField=function(name)
         "value":json_values
         }
     row=meForm.Hole.makeEditField(pars,json_values)
-
     $(del_type).remove();
     $(del_dia).remove();
     $(name_replace).replaceWith(row);
 }
 
-meForm.Hole.updateField=function(name)
+meForm.Hole.updateValues=function(name)
 {
-    name_hidden="input[name='"+name+":string'"
-    name_type="select[name='"+name.slice(0,-1)+"_type]:number'"
-
-    new_values={'type':$(name_type).val()}
+    var name_hidden="input[name='"+name+":string'"
+    var name_type="select[name='"+name.slice(0,-1)+"_type]:number'"
+    var new_values={'type':$(name_type).val()}
     if (new_values.type=='1')
     {name_dia="input[name='"+name.slice(0,-1)+"_dia]:number'"}
     else
@@ -871,8 +829,7 @@ meForm.Hole.updateField=function(name)
     $(name_hidden).val(JSON.stringify(new_values));
 }
 
-meForm.Widget['hole']=meForm.Hole.makeEditField
-
+meForm.Widget['hole']=meForm.Hole
 
 //---------------------------------------------MENU FUNCTION----------------------------------------//
 
