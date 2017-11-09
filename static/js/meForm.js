@@ -3,10 +3,16 @@
 // 							      //
 
 
-
 var meForm={LastUpdate:'06-11-2017'};
 meForm.Widget={}
 
+function appendTag(name,tag)
+{
+ var ll=name.slice(-1)
+ if (ll==']'){var result=name.slice(0,-1)+"_"+tag+"]"}
+ else{var result=name+"_"+tag}
+ return result
+}
 
 meForm.hiddenField = function(vars,values='{}')
 {
@@ -14,11 +20,9 @@ meForm.hiddenField = function(vars,values='{}')
     var label = vars.label || '';
     var name = vars.name || '';
     var width = vars.width || 'auto';
-    //var onchange = vars.onchange || ''
     var args = vars.args || {};
-    //var style = args.style || '';
     var form_name='"'+name+':string" '
-    var row='<tr id='+form_name
+    var row='<tr hidden id='+form_name
     for (arg in args) {row+=' '+arg+'="'+args[arg]+'"'}
     row+='>'+
          '<th colspan="2" id='+form_name+'>'+label+'</th>'+
@@ -144,20 +148,29 @@ meForm.selectJsonList = function(vars,value=-1)
 }
 
 
-meForm.getJson = function (urlPath,jsonPath)
+meForm.getJson = function (obj,urlPath,jsonPath,destination,callback,cbParam)
 {
-     $.ajax(
+    obj.DataLoading=true
+    $.ajax(
+    {
+        url: urlPath,
+        type: "POST",
+        data: {'jsonPath':jsonPath},
+        dataType: "json",
+        success:function(result)
         {
-           url: urlPath,
-           type: "POST",
-           data: {'jsonPath':jsonPath},
-           dataType: "json",
-           success:function(result)
-                    {
-                        alert(JSON.stringify(result));
-                    }
-
-        })
+            //console.log(result.source);
+            destination=JSON.parse(result.source)
+            console.log(obj)
+            //obj.DataLoaded=true
+            //callback(cbParam);
+        },
+        complete:function()
+        {
+           obj.DataLoaded=true
+           callback(cbParam);
+        }
+    })
 }
 
 
@@ -236,6 +249,7 @@ meForm.addSForm = function(vars,values={}) //aggiunge un sub-form o maschera ann
 
     for(index in vars.form){values[vars.form[index].name]=vars.form[index].value}
     $('tr#'+vars.id).before(this.makeSubFormWidget(vars.id,count,vars.form,values));
+    update_all();
 }
 
 
@@ -264,9 +278,7 @@ meForm.makeFormWidget = function(fwData,fwValues)
                 row+=this.selectJsonList(data,fwValues[data.name]);
         }
         if (this.Widget.hasOwnProperty(data.class))
-        {   console.log(data)
-            console.log(fwValues)
-            row+=this.Widget[data.class].makeEditField(data,fwValues[data.name])}
+        {   row+=this.Widget[data.class].makeEditField(data,fwValues[data.name])}
 
     }
     return row
@@ -561,20 +573,20 @@ meForm.addTableRowButton = function(label,id,colspan)/// da eliminare!!!
 }
 
 
-// ---------------- meForm.SheetMaterial - widget for editing holes ---------------------
+// ----------- meForm.SheetMaterial - widget for editing sheet material ---------------
 
-meForm.SheetMaterial={MATERIALS:{}}
+meForm.SheetMaterial={MATERIALS:{},DataLoaded:false,DataLoading:false}
+
 meForm.SheetMaterial.makeEditField=function(pars,vals)
 {
     var row=meForm.hiddenField(pars,vals)
     var values=JSON.parse(vals)
-    var tname=pars.name.slice(0,-1)+"_material]"
     var f_mat_change="meForm.SheetMaterial.updateFields(&quot;"+pars.name+"&quot;)"
     var f_thk_change="meForm.SheetMaterial.updateValues(&quot;"+pars.name+"&quot;)"
     var mpars={
         "class": "list",
         "label": "materiale",
-        "name": "material",
+        "name": appendTag(pars.name,"mat"),
         "width": 50,
         "value": 1,
         "type":"string",
@@ -588,15 +600,25 @@ meForm.SheetMaterial.makeEditField=function(pars,vals)
         "value": 5,
         "width": 30,
         "values":[],
-        "name": "thickness",
+        "name": appendTag(pars.name,"thk"),
         "args": {}
         }
     row+=meForm.editList(tpars,values.thickness)
+    if (!(meForm.SheetMaterial.DataLoaded))
+    {
+        if(!(meForm.SheetMaterial.DataLoading))
+        {
+            meForm.SheetMaterial.loadData("/makeasy/item/getJson",
+                                          "Materials/material_quality.json",
+                                          pars.name)
+        }
+    }
     return row
 }
 
-meForm.SheetMaterial.loadData= function(url,json_path)
+meForm.SheetMaterial.loadData= function(url,json_path,name)
 {
+    meForm.SheetMaterial.DataLoading=true
     $.ajax(
     {
         url: url,
@@ -606,26 +628,63 @@ meForm.SheetMaterial.loadData= function(url,json_path)
         success:function(result)
         {
             meForm.SheetMaterial.MATERIALS = JSON.parse(result.source)
+            meForm.SheetMaterial.DataLoaded=true
+            meForm.SheetMaterial.updateMaterialField(name)
         }
     })
 }
 
-meForm.SheetMaterial.updateThicknessField=function (name) //da sistemare!!!
+meForm.SheetMaterial.updateValues=function (name)
 {
-    var htmlOptions=" ";
-    for (var key in meForm.SheetMaterial.MATERIALS)
-    {
-        htmlOptions+="<OPTION value='"+key+"'>"+MATERIALS[key].name+"</OPTION>";
-    }
-    var replace="<SELECT name='material:string'"
-    replace +=" onchange=fill_thickness_selector() >"
-    replace +=htmlOptions
-    replace +="</SELECT>"
-    $("select[name='material:string']").replaceWith(replace);
-    $("select[name='material:string']").val(material)
-    fill_thickness_selector(material,thk);
+    var name_hidden="input[name='"+name+":string']"
+    var name_mat="select[name='"+appendTag(name,"mat")+":string']"
+    var name_thk="select[name='"+appendTag(name,"thk")+":number']"
+    var new_values={'material':$(name_mat).val(),'thickness':$(name_thk).val()}
+    $(name_hidden).val(JSON.stringify(new_values));
 }
 
+meForm.SheetMaterial.updateMaterialField=function (name)
+{
+    var name_hidden="input[name='"+name+":string']"
+    var mat=JSON.parse($(name_hidden).val()).material
+    var name_mat="select[name='"+appendTag(name,"mat")+":string']"
+    var html_options=" ";
+    for (var key in meForm.SheetMaterial.MATERIALS)
+    {
+        html_options+="<OPTION value='"+key+"'>"+this.MATERIALS[key].name+"</OPTION>";
+    }
+    var html="<SELECT name='"+appendTag(name,"mat")+":string'"
+    html +=" onchange=meForm.SheetMaterial.updateThicknessField('"+name+"') >"
+    html +=html_options
+    html +="</SELECT>"
+    $(name_mat).replaceWith(html)
+    $(name_mat).val(mat)
+    meForm.SheetMaterial.updateThicknessField(name)
+}
+
+meForm.SheetMaterial.updateThicknessField=function (name)
+{
+    var name_hidden="input[name='"+name+":string']"
+    var values=JSON.parse($(name_hidden).val())
+    var name_mat="select[name='"+appendTag(name,"mat")+":string']"
+    var mat=$(name_mat).val()
+    var name_thk="select[name='"+appendTag(name,"thk")+":number']"
+    var list=meForm.SheetMaterial.MATERIALS[mat].thickness
+    var html_options=" ";
+    for (var key in list)
+    {
+        html_options+="<OPTION value='"+key+"'>"+list[key].name+"</OPTION>";
+    }
+    var html="<SELECT name='"+appendTag(name,"thk")+":number'"
+    html +=" onchange=meForm.SheetMaterial.updateValues('"+name+"') >"
+    html+=html_options
+    html +="</SELECT>"
+    $(name_thk).replaceWith(html);
+    console.log(values)
+    $(name_thk).val(values.thickness);
+    meForm.SheetMaterial.updateValues(name)
+    update_all();
+}
 
 meForm.Widget['sheet_material']=meForm.SheetMaterial
 
@@ -636,13 +695,12 @@ meForm.Hole.makeEditField=function(pars,vals)
 {
     var row=meForm.hiddenField(pars,vals)
     var values=JSON.parse(vals)
-    var tname=pars.name.slice(0,-1)+"_type]"
     var f_type_change="meForm.Hole.updateFields(&quot;"+pars.name+"&quot;)"
     var f_dia_change="meForm.Hole.updateValues(&quot;"+pars.name+"&quot;)"
     var tpars={
           "class": "list",
           "label": "tipo foro",
-          "name": tname,
+          "name": appendTag(pars.name,"type"),
           "value":"1",
           "width": 50,
           "args": {"onchange":f_type_change},
@@ -658,25 +716,25 @@ meForm.Hole.makeEditField=function(pars,vals)
     {
         case '1':
             dvars=meForm.Hole.Types['1']
-            dvars.name=pars["name"].slice(0,-1)+"_dia]"
+            dvars.name=appendTag(pars.name,"dia"),
             dvars["args"]={"onchange":f_dia_change}
             row+=meForm.editNumber(dvars,values.dia)
             break;
         case '2':
             dvars=meForm.Hole.Types['2']
-            dvars["name"]=pars["name"].slice(0,-1)+"_dia]"
+            dvars.name=appendTag(pars.name,"dia"),
             dvars["args"]={"onchange":f_dia_change}
             row+=meForm.editList(dvars,values.dia)
             break;
         case '3':
             dvars=meForm.Hole.Types['3']
-            dvars["name"]=pars["name"].slice(0,-1)+"_dia]"
+            dvars.name=appendTag(pars.name,"dia"),
             dvars["args"]={"onchange":f_dia_change}
             row+=meForm.editList(dvars,values.dia)
             break;
         case '4':
             dvars=meForm.Hole.Types['4']
-            dvars["name"]=pars["name"].slice(0,-1)+"_dia]"
+            dvars.name=appendTag(pars.name,"dia"),
             dvars["args"]={"onchange":f_dia_change}
             row+=meForm.editList(dvars,values.dia)
             break;
@@ -785,11 +843,10 @@ meForm.Hole.Types=
     }
 }
 
-
 meForm.Hole.updateFields=function(name)
 {
-    var name_hidden="input[name='"+name+":string'"
-    var name_type="select[name='"+name.slice(0,-1)+"_type]:number'"
+    var name_hidden="input[name='"+name+"]:string']"
+    var name_type="select[name='"+appendTag(name,"type")+":number'"
     var del_type="tr[id='"+name.slice(0,-1)+"_type]:number'"
     var name_replace="tr[id='"+name.slice(0,-1)+"]:string'"
     var new_values={'type':$(name_type).val()}
@@ -803,8 +860,6 @@ meForm.Hole.updateFields=function(name)
         new_values.dia=$(name_dia).val()
     }
     var json_values=JSON.stringify(new_values)
-    console.log(json_values)
-    console.log(name_replace)
     var pars={
         "class":"hole",
         "name":name,
@@ -814,6 +869,7 @@ meForm.Hole.updateFields=function(name)
     $(del_type).remove();
     $(del_dia).remove();
     $(name_replace).replaceWith(row);
+    update_all();
 }
 
 meForm.Hole.updateValues=function(name)
@@ -834,7 +890,6 @@ meForm.Widget['hole']=meForm.Hole
 //---------------------------------------------MENU FUNCTION----------------------------------------//
 
 meForm.loadMenu=function(menu) {this.menu=menu;}
-
 
 meForm.updateMenu=function()
 {
