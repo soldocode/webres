@@ -36,6 +36,20 @@ meForm.hiddenField = function(vars,values='{}')
     return row
 }
 
+meForm.writeString=function(vars)
+// vars.label
+// vars.text
+// vars.width
+// vars.name
+{
+    var form_name='"'+name+':string" '
+    row='<tr id='+form_name+'>'+
+         '<th colspan="2" id='+form_name+'>'+vars.label+'</th>'+
+         '<td name='+form_name+'id='+form_name+
+         ' style="width:'+vars.width+'%" >'+vars.text+'</td></tr>';
+    return row
+}
+
 meForm.editList = function(vars,v=-1)
   {
     var vars = vars || {};
@@ -459,7 +473,12 @@ meForm.makeIcon = function (ibName,iOnClick,iArgs)
     return row
 }
 
-
+// meForm.deployTable(vars)
+// vars.id --> id in form
+// vars.buttons
+// vars.rows
+// vars.col_header --> columns header ['head1','head2','head3']
+// vars.col_width --> columns widths in percent [10,20,40]
 meForm.deployTable = function (vars)
 {
 
@@ -512,7 +531,7 @@ meForm.deployTable = function (vars)
       {
           html+='<a onclick='+buttons[i].onclick+
                ' id="'+vars.id+'_button_'+buttons[i].id+'"'+
-               ' class="button" data-w2p_disable_with="default">'+buttons[i].label
+               ' class="button">'+buttons[i].label
           html+='</a><span> </span>'
       }
   }
