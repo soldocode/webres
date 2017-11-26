@@ -132,7 +132,7 @@ button:hover,a.button:hover
 
 .makEasy span.glyphicon
 {
-  color:#cccccc;
+  /*color:#cccccc;*/
   text-decoration:none;
 }
 
@@ -266,14 +266,14 @@ ul#menu li
  display: inline;
  margin-right:25px;
  padding:3px;
- color:#D6D6D6;
+ /*color:#D6D6D6;*/
  position:relative;
 }
 
 ul#menu li a
 {
  padding-bottom:8px;
- color:#D6D6D6;
+ /*color:#D6D6D6;*/
 }
 
 ul#menu li a:hover
@@ -315,7 +315,7 @@ ul#menu ul a.menu {
     display:block;
     white-space:nowrap;
     float:none;
-    color:#D6D6D6;
+    /*color:#D6D6D6;*/
     text-decoration: none;
 }
 
@@ -326,7 +326,7 @@ ul#menu ul a:hover {
 a.menu
 {
  /*background:#333333*/;
- color:#D6D6D6;
+ /*color:#D6D6D6;*/
  cursor:pointer;
  text-decoration:none;
 }

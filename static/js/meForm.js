@@ -137,6 +137,34 @@ meForm.editNumber = function(vars,value=0)
   }
 
 
+//meForm.editString
+//make string field
+meForm.editString = function(vars,value='')
+  {
+    var vars = vars || {};
+    var label = vars.label || '';
+    var name = vars.name || '';
+    var width = vars.width || 'auto';
+    var onchange = vars.onchange || ''
+    var args = vars.args || {};
+    var style = args.style || '';
+    var form_name='"'+name+':string" '
+    var row='<tr id='+form_name
+    for (arg in args) {row+=' '+arg+'="'+args[arg]+'"'}
+    row+='>'+
+         '<th colspan="2" id='+form_name+'>'+label+'</th>'+
+         '<td>'+
+         '<input class="number value"'+
+         'name='+form_name+
+         ' id='+form_name+' value="'+value+
+         '" type="string" '+
+         ' style="width:'+width+'%" >'+
+         '</input></td></tr>';
+
+    return row
+  }
+
+
 meForm.selectJsonList = function(vars,value=-1)
 {
     var vars = vars || {};
@@ -318,59 +346,7 @@ meForm.makeSubFormWidget = function(sfId,sfCount,sfData,sfValues={}) //crea un s
 }
 
 
-meForm.makeTableFields = function(vars) //crea subform a tabella
-{
-  var vars = vars || {};
-  var TFid = vars.id || '';
-  var buttons = vars.buttons || [];
-
-
-  var row='<tr id="header_'+vars.id+'"><th>'+vars.label+'</th>'
-  row +=  "<th class='expand' id='"+vars.id+"' onclick=meForm.expand('"+vars.id+"')>";
-  if (vars.visible=="false")
-     {
-         row +="+</th></tr><tr id="+vars.id +" style='display: none;'"
-     }
-  else
-     {
-         row +="-</th></tr><tr id="+vars.id;
-     }
-
-  row +="><td colspan=3><table class='makEasy' id='"+vars.id+"' width='100%'><colgroup>"
-
-  for (w in vars.col_width) {row +='<col width="'+vars.col_width[w]+'%">'}
-  row +="</colgroup><tbody><tr>";
-
-  for (h in vars.col_header) {row +='<th>'+vars.col_header[h]+'</th>'}
-  row += '</tr>'
-  row += '</tbody></table>'
-  row += '<div style="margin:10px;">'
-  for (i in buttons)
-  {
-      if (buttons[i].class=="load")
-      {
-          var onclickcont='"$(&quot;#selectfiles'+i+'&quot;).trigger(&quot;click&quot;)"'
-          row+='<a onclick='+onclickcont+
-               ' id="'+vars.id+'_button_'+buttons[i].id+'"'+
-               ' class="button">'+buttons[i].label+'</a>'
-          row+='<input type="file" name="files[]" id="selectfiles'+i+'" style="display:none">'
-          row+='<span> </span>'
-      }
-      else
-      {
-          row+='<a onclick='+buttons[i].onclick+
-               ' id="'+vars.id+'_button_'+buttons[i].id+'"'+
-               ' class="button">'+buttons[i].label
-          row+='</a><span> </span>'
-      }
-  }
-  row += '</div>';
-  row += '</td></tr>';
-
-  return row
-}
-
-
+// ----------- meForm.makeMSForm - widget for multiple subform ---------------
 meForm.makeMSForm = function(vars,msName,msValues)
 {
     var vars = vars || {};
@@ -473,13 +449,119 @@ meForm.makeIcon = function (ibName,iOnClick,iArgs)
     return row
 }
 
-// meForm.deployTable(vars)
+
+meForm.makeTableFields_deprecated = function(vars) //crea subform a tabella ???? usato da qualche parte? bo?
+{
+  var vars = vars || {};
+  var TFid = vars.id || '';
+  var buttons = vars.buttons || [];
+
+
+  var row='<tr id="header_'+vars.id+'"><th>'+vars.label+'</th>'
+  row +=  "<th class='expand' id='"+vars.id+"' onclick=meForm.expand('"+vars.id+"')>";
+  if (vars.visible=="false")
+     {
+         row +="+</th></tr><tr id="+vars.id +" style='display: none;'"
+     }
+  else
+     {
+         row +="-</th></tr><tr id="+vars.id;
+     }
+
+  row +="><td colspan=3><table class='makEasy' id='"+vars.id+"' width='100%'><colgroup>"
+
+  for (w in vars.col_width) {row +='<col width="'+vars.col_width[w]+'%">'}
+  row +="</colgroup><tbody><tr>";
+
+  for (h in vars.col_header) {row +='<th>'+vars.col_header[h]+'</th>'}
+  row += '</tr>'
+  row += '</tbody></table>'
+  row += '<div style="margin:10px;">'
+  for (i in buttons)
+  {
+      if (buttons[i].class=="load")
+      {
+          var onclickcont='"$(&quot;#selectfiles'+i+'&quot;).trigger(&quot;click&quot;)"'
+          row+='<a onclick='+onclickcont+
+               ' id="'+vars.id+'_button_'+buttons[i].id+'"'+
+               ' class="button">'+buttons[i].label+'</a>'
+          row+='<input type="file" name="files[]" id="selectfiles'+i+'" style="display:none">'
+          row+='<span> </span>'
+      }
+      else
+      {
+          row+='<a onclick='+buttons[i].onclick+
+               ' id="'+vars.id+'_button_'+buttons[i].id+'"'+
+               ' class="button">'+buttons[i].label
+          row+='</a><span> </span>'
+      }
+  }
+  row += '</div>';
+  row += '</td></tr>';
+
+  return row
+}
+
+// ----------- meForm.editCheckList - widget for editing checklist ---------------
+
+meForm.editCheckList = function (vars)
+// vars.label
+// vars.rows=[{'id':1,'title':'ELEMENT1','selected':true},{'id':2,'title':'ELEMENT2','selected':false}]
+// vars.width
+// vars.name
+{
+    var name=vars.name
+    var html="<tr id=header_"+vars.name+"><th colspan=2 id=header_"+vars.name+">"+vars.label+"</th></tr>"
+    html+= "<tr><td colspan=3><table><tbody>"
+    for (i in vars.rows)
+    {
+        check_name=name+"["+i+"]"
+        vars.name=check_name
+        html+= '<tr>'
+        h_values={'selected':true}
+        html+= this.hiddenField(vars,JSON.stringify(h_values))
+        html+='<th>'
+        html+= this.makeIcon("glyphicon-check",
+                             "meForm.invertCheckSelection('"+vars.name+"')",
+                             "id='"+vars.name+"'")
+        html+= '</th><td>'
+        html+= vars.rows[i].title
+        html+= '</td></tr>'
+    }
+    html+= '</tbody></table></td></tr>';
+    return html
+}
+
+
+meForm.invertCheckSelection= function(name)
+{
+    var selector="[name='"+name+":string']"
+    var values=JSON.parse($("input"+selector).val())
+    values.selected=!(values.selected)
+    $("input"+selector).val(JSON.stringify(values))
+    if (values.selected)
+    {
+        $("span.glyphicon[id='"+name+"'").replaceWith(this.makeIcon("glyphicon-check",
+                             "meForm.invertCheckSelection('"+name+"')",
+                             "id='"+name+"'"))
+    }
+    else
+    {
+        $("span.glyphicon[id='"+name+"'").replaceWith(this.makeIcon("glyphicon-unchecked",
+                             "meForm.invertCheckSelection('"+name+"')",
+                             "id='"+name+"'"))
+    }
+}
+
+
+// ----------- meForm.deployTable - widget for table editing ---------------
+
+meForm.deployTable = function (vars)
 // vars.id --> id in form
 // vars.buttons
 // vars.rows
 // vars.col_header --> columns header ['head1','head2','head3']
 // vars.col_width --> columns widths in percent [10,20,40]
-meForm.deployTable = function (vars)
 {
 
   var vars = vars || {};
@@ -562,13 +644,12 @@ meForm.editRowTable= function (vars)
 
 
 meForm.TR_BUTTONS = function(trId,btns,colspan)
-//////////////////////////////////////////////
 // btns:{"button1":{"title":"Button 1",
 //                  "arg":"arg"},
 //       "button2":{"title":"Button 2",
 //                  "arg":"arg"}
 //      }
-//////////////////////////////////////////////
+
 {
 	html='<tr class="buttons"><td colspan='+colspan+'>';
 	for (btn in btns)
@@ -581,7 +662,7 @@ meForm.TR_BUTTONS = function(trId,btns,colspan)
 }
 
 
-meForm.addTableRowButton = function(label,id,colspan)/// da eliminare!!!
+meForm.addTableRowButton_deprecated = function(label,id,colspan)/// da eliminare!!!
 {
     html='<tr><td colspan='+colspan+' style="border-top-width: 7px;border-bottom-width: 7px;">';
     html+='<a onclick="confirm_'+label+'()" id="'+label+'_button_ok" class="button" data-w2p_disable_with="default">Conferma</a>';
