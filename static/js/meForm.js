@@ -512,7 +512,8 @@ meForm.editCheckList = function (vars)
 {
     var name=vars.name
     var html="<tr id=header_"+vars.name+"><th colspan=2 id=header_"+vars.name+">"+vars.label+"</th></tr>"
-    html+= "<tr><td colspan=3><table><tbody>"
+    html+= "<tr><td colspan=3><table>"
+    html+= "<colgroup><col width=10%><col width=90%></colgroup><tbody>"
     for (i in vars.rows)
     {
         check_name=name+"["+i+"]"
@@ -651,7 +652,7 @@ meForm.TR_BUTTONS = function(trId,btns,colspan)
 //      }
 
 {
-	html='<tr class="buttons"><td colspan='+colspan+'>';
+	html='<tr class="buttons"><td style="padding-top:10px;" colspan='+colspan+'>';
 	for (btn in btns)
 	{
 		html+='<span>  </span>';
