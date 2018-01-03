@@ -266,7 +266,7 @@ ul#menu li
  display: inline;
  margin-right:25px;
  padding:3px;
- /*color:#D6D6D6;*/
+ color:#D6D6D6;
  position:relative;
 }
 
@@ -326,7 +326,7 @@ ul#menu ul a:hover {
 a.menu
 {
  /*background:#333333*/;
- /*color:#D6D6D6;*/
+ color:#D6D6D6;
  cursor:pointer;
  text-decoration:none;
 }
