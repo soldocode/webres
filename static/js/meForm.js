@@ -724,7 +724,7 @@ meForm.SheetMaterial.loadData= function(url,json_path,name)
     {
         url: url,
         type: "POST",
-        data: {'jsonPath':json_path},
+        data: {'jsonPath':json_path,'csrfmiddlewaretoken':csrftoken},
         dataType: "json",
         success:function(result)
         {
