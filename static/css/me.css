@@ -3,12 +3,12 @@
       direction: rtl;
       overflow: auto;
       overflow-x: hidden;
-      float:left;
+      left: 0px;
+      bottom: 0px;
       display:block;
-      width:30%;
       z-index:3;
-      height:90%;
-      position:absolute;
+      height:76%;
+      position:relative;
       }
 
 a,u
