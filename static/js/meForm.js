@@ -506,7 +506,7 @@ meForm.makeTableFields_deprecated = function(vars) //crea subform a tabella ????
 
 meForm.editCheckList = function (vars)
 // vars.label
-// vars.rows=[{'id':1,'title':'ELEMENT1','selected':true},{'id':2,'title':'ELEMENT2','selected':false}]
+// vars.rows=[{'id':1,'title':'ELEMENT1','selected':'true'},{'id':2,'title':'ELEMENT2','selected':'false'}]
 // vars.width
 // vars.name
 {
@@ -519,7 +519,7 @@ meForm.editCheckList = function (vars)
         check_name=name+"["+i+"]"
         vars.name=check_name
         html+= '<tr>'
-        h_values={'selected':true}
+        h_values={"selected":"true"}
         html+= this.hiddenField(vars,JSON.stringify(h_values))
         html+='<th>'
         html+= this.makeIcon("glyphicon-check",
@@ -538,9 +538,13 @@ meForm.invertCheckSelection= function(name)
 {
     var selector="[name='"+name+":string']"
     var values=JSON.parse($("input"+selector).val())
-    values.selected=!(values.selected)
+    if (values.selected=='true')
+        {values.selected='false'}
+    else
+        {values.selected='true'}
+
     $("input"+selector).val(JSON.stringify(values))
-    if (values.selected)
+    if (values.selected=='true')
     {
         $("span.glyphicon[id='"+name+"'").replaceWith(this.makeIcon("glyphicon-check",
                              "meForm.invertCheckSelection('"+name+"')",
