@@ -7,6 +7,7 @@ function MeIndex(divId)
   this.model=[]
   this.html='<div id='+this.divId+'><h1>Index of '+this.divId+'</h1></div>'
   this.filter_loader=""
+  this.content=[]
 };
 
 
@@ -74,19 +75,20 @@ MeIndex.prototype.load_filter = function (path,id)
 }
 
 
-MeIndex.prototype.deploy_content = function(rec_min,rec_max)
+MeIndex.prototype.load_content = function(rec_min,rec_range)
 {
   values={}
   values.rec_min=rec_min
-  values.rec_max=rec_max
-  $.ajax({url:this.filter_loader+'deploy_content',
+  values.rec_max=rec_range
+  var this_obj=this
+  $.ajax({url:this.filter_loader+'load_content',
           type:"POST",
           data:null,
           dataType: "json",
           success:function(result)
            {
-             console.log(result.content);
-           }
+             this_obj.content=result.rows
+           },
         });
 };
 
