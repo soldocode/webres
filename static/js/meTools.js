@@ -12,6 +12,24 @@ function MeIndex(divId)
 }
 
 
+MeIndex.prototype.load_model = function (model_name)
+{
+  var this_obj=this
+  $.ajax({url:this.app_url+'load_model_'+model_name,
+          type:"POST",
+          //data:values,
+          dataType: "json",
+          success:function(result)
+          {
+            this_obj.model=result.model
+          },
+          complete:function()
+          {
+            this_obj.render_model()
+          }
+         });
+}
+
 MeIndex.prototype.render_model = function ()
 {
   //html='<div id='+this.divId+'>'
@@ -38,15 +56,11 @@ MeIndex.prototype.render_model = function ()
   html+='</thead>'
   html+='<tbody id="rows_'+this.divId+'"></tbody>'
   html+='</table>'
-  //html+='</div>'
+  //html+='</div'
   this.html=html;
 
   $("div#"+this.divId).html(this.html);
-  //for (var i in this.filter)
-  //{
-  //  console.log(i)
-  //  this.render_filter('evaso')
-  //}
+
 }
 
 
@@ -71,8 +85,12 @@ MeIndex.prototype.load_filter = function (filter,id)
           success:function(result)
            {
              this_obj.filters[id]=result.options
+             //this_obj.render_filter(id,filter.default)
+           },
+          complete:function(result){
              this_obj.render_filter(id,filter.default)
-           }
+            //console.log('load filter complete...')
+          }
         });
 }
 
@@ -90,6 +108,7 @@ MeIndex.prototype.render_filter=function (id,value)
   }
   html+="</select>"
   $("th#filter_"+id).html(html);
+  console.log('render filter complete...')
 }
 
 
