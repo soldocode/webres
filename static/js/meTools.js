@@ -11,23 +11,27 @@ function MeIndex(divId)
   this.filters={}
 }
 
-
 MeIndex.prototype.load_model = function (model_name)
 {
   var this_obj=this
+  var dfd = $.Deferred();
   $.ajax({url:this.app_url+'load_model_'+model_name,
           type:"POST",
-          //data:values,
           dataType: "json",
           success:function(result)
           {
             this_obj.model=result.model
+            console.log('load_mode call successful...')
           },
           complete:function()
           {
             this_obj.render_model()
+            console.log('load_mode call completed...')
+            dfd.resolve();
           }
          });
+  console.log('load_mode funct end...')
+  return dfd.promise();
 }
 
 MeIndex.prototype.render_model = function ()
@@ -66,40 +70,57 @@ MeIndex.prototype.render_model = function ()
 
 MeIndex.prototype.load_filters = function (path)
 {
+  var dfd = $.Deferred();
+  var filters=[]
   for (i in this.model)
   {
-    var filter=this.model[i].filter
+    filter=this.model[i].filter
     if (filter!=null)
-    this.load_filter(filter,this.model[i].field)
+    {
+      filters.push([filter,this.model[i].field])
+    }
   }
+  $.when(this.load_filter(filters)).done(function(){dfd.resolve()})
+  return dfd.promise()
 }
 
 
-MeIndex.prototype.load_filter = function (filter,id)
+MeIndex.prototype.load_filter = function (filters)
 {
+  var dfd = $.Deferred();
   var this_obj=this
-  $.ajax({url:this.filter_loader+filter.origin,
+  if (filters.length==0)
+  {
+      dfd.resolve();
+  }
+  else
+  {
+      var filter=filters.pop()
+      $.ajax({url:this.filter_loader+filter[0].origin,
           type:"POST",
           data:null,
           dataType: "json",
           success:function(result)
            {
-             this_obj.filters[id]=result.options
-             //this_obj.render_filter(id,filter.default)
+             this_obj.filters[filter[1]]=result.options
            },
           complete:function(result){
-             this_obj.render_filter(id,filter.default)
-            //console.log('load filter complete...')
+             console.log('load filter'+filter[0].origin+' complete...')
+             $.when(this_obj.load_filter(filters)).done(function(){dfd.resolve()})
+             this_obj.render_filter(filter[1],filter[0].default)
           }
         });
+  }
+  return dfd.promise()
 }
+
 
 
 MeIndex.prototype.render_filter=function (id,value)
 {
   var opts= this.filters[id];
   var selected=''
-  html='<select class="border-0" onchange="deploy_content(0,200)">'
+  html='<select class="border-0" onchange="update_content()">'
   for (i in opts)
   {
     selected=''
@@ -125,9 +146,14 @@ MeIndex.prototype.load_content = function(rec_min,rec_range,filters)
           dataType: "json",
           success:function(result)
            {
+             console.log('load_content call succsefull...')
              this_obj.content=result.rows
-             this_obj.render_content()
            },
+          complete:function(result)
+          {
+            this_obj.render_content()
+            console.log('load_content call completed...')
+          },
         });
 }
 
