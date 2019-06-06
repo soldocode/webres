@@ -115,7 +115,6 @@ MeIndex.prototype.load_filter = function (filters)
 }
 
 
-
 MeIndex.prototype.render_filter=function (id,value)
 {
   var opts= this.filters[id];
@@ -124,7 +123,7 @@ MeIndex.prototype.render_filter=function (id,value)
   for (i in opts)
   {
     selected=''
-    if (i==opts[i][1]){selected='selected="selected"'}
+    if (opts[i][1]==value){selected='selected="selected"'}
     html+='<option '+selected+' value="'+opts[i][1]+'">'+opts[i][0]+'</option>'
   }
   html+="</select>"
@@ -137,12 +136,12 @@ MeIndex.prototype.load_content = function(rec_min,rec_range,filters)
 {
   values={}
   values.rec_min=rec_min
-  values.rec_max=rec_range
+  values.rec_range=rec_range
   values.filters=filters
   var this_obj=this
   $.ajax({url:this.filter_loader+'load_content',
           type:"POST",
-          data:null,
+          data:values,
           dataType: "json",
           success:function(result)
            {
