@@ -210,3 +210,49 @@ MeIndex.prototype.hide = function ()
 {
   console.log('hiding')
 }
+
+
+function MeForm(divId)
+{
+  this.divId=divId
+  this.model=[]
+  this.html='<div id='+this.divId+'><h3>Form of '+this.divId+'</h3></div>'
+  this.values=[]
+}
+
+MeForm.prototype.load_model = function (model_name)
+{
+  var this_obj=this
+  var dfd = $.Deferred();
+  $.ajax({url:this.app_url+'load_model_'+model_name,
+          type:"POST",
+          dataType: "json",
+          success:function(result)
+          {
+            this_obj.model=result.model
+            console.log('load_mode call successful...')
+          },
+          complete:function()
+          {
+            this_obj.render_model()
+            console.log('load_mode call completed...')
+            dfd.resolve();
+          }
+         });
+  console.log('load_mode funct end...')
+  return dfd.promise();
+}
+
+
+MeForm.prototype.render_model = function ()
+{
+  html='<table class="table" id="form-'+this.divId+'">'
+  html+='<colgroup><col width="50%"><col width="5%"><col width="45%"></colgroup>'
+  html+='<tbody id="fields_'+this.divId+'">'
+  html+='</tbody>'
+  html+='</table>'
+  this.html=html;
+
+  $("div#"+this.divId).html(this.html);
+
+}
