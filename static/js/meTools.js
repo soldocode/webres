@@ -246,9 +246,17 @@ MeForm.prototype.load_model = function (model_name)
 
 MeForm.prototype.render_model = function ()
 {
-  html='<table class="table" id="form-'+this.divId+'">'
+  html='<table class="table table-borderless" id="form-'+this.divId+'">'
   html+='<colgroup><col width="50%"><col width="5%"><col width="45%"></colgroup>'
   html+='<tbody id="fields_'+this.divId+'">'
+  for (i in this.model)
+  {
+    html+='<tr>'
+    html+='<th>'+this.model[i].label+'</th>'
+    html+='<td></td>'
+    html+='<td><input type="text"></td>'
+    html+='</tr>'
+  }
   html+='</tbody>'
   html+='</table>'
   this.html=html;
