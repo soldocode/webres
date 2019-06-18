@@ -1,6 +1,9 @@
 // meTools - JavaScript Module     //
 // Riccardo Soldini  2019          //
 
+
+///////////////////////////////// MeIndex /////////////////////////////////////
+
 function MeIndex(divId)
 {
   this.divId=divId
@@ -212,6 +215,8 @@ MeIndex.prototype.hide = function ()
 }
 
 
+///////////////////////////////// MeForm /////////////////////////////////////
+
 function MeForm(divId)
 {
   this.divId=divId
@@ -244,7 +249,7 @@ MeForm.prototype.load_model = function (model_name)
 }
 
 
-MeForm.prototype.render_model = function ()
+MeForm.prototype.render_model_old = function ()
 {
   html='<table class="table table-borderless" id="form-'+this.divId+'">'
   html+='<colgroup><col width="50%"><col width="5%"><col width="45%"></colgroup>'
@@ -263,4 +268,49 @@ MeForm.prototype.render_model = function ()
 
   $("div#"+this.divId).html(this.html);
 
+}
+
+
+MeForm.prototype.render_model = function ()
+{
+  html='<form id="form-'+this.divId+'">'
+  for (i in this.model)
+  {
+    fmodel=this.model[i]
+    html+=FormWidget[fmodel.class](fmodel)
+    html+='</div>'
+  }
+  html+='</form>'
+  this.html=html;
+
+  $("div#"+this.divId).html(this.html);
+}
+
+
+//////////////////////////////// FormWidget ///////////////////////////////////
+
+FormWidget={}
+
+FormWidget['text']=function(f){
+  html='<div class="form-group row">'
+  html+='<label for="'+f.field+'" class="col-sm-2 col-form-label">'
+  html+=f.label+'</label>'
+  html+='<div class="col-sm-'+f.width+'">'
+  html+='<input type="text" class="form-control" id="'+f.field+'">'
+  html+='</div></div>'
+  return html
+}
+
+
+FormWidget['select']=function(f){
+  html='<div class="form-group row">'
+  html+='<label for="'+f.field+'" class="col-sm-2 col-form-label">'
+  html+=f.label+'</label>'
+  html+='<div class="col-sm-'+f.width+'">'
+  html+='<select class="form-control" id="'+f.field+'">'
+  for (o in f.values){
+    html+='<option value="'+f.values[o]['value']+'">'+f.values[o]['text']+'</option>'
+  }
+  html+='</select></div></div>'
+  return html
 }

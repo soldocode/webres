@@ -129,7 +129,7 @@ button:hover,a.button:hover
  cursor:pointer;
 }
 
-
+/* formattazione table makEasy */
 .makEasy span.glyphicon
 {
   /*color:#cccccc;*/
@@ -141,9 +141,7 @@ button:hover,a.button:hover
   color:#ffffff;
 }
 
-
-/* formattazione table makEasy */
-.makEasy
+.makEasy table
 {
 width:100%;
 border-collapse:collapse;
@@ -353,5 +351,3 @@ tr.filter td input
 	width:100%;
 }
 /*fine formattazione filtri*/
-
-
