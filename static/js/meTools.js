@@ -223,6 +223,8 @@ function MeForm(divId)
   this.model=[]
   this.html='<div id='+this.divId+'><h3>Form of '+this.divId+'</h3></div>'
   this.values=[]
+  this.after_render_calls=[]
+  this.after_rendering_callback=function(){console.log('rendered')}
 }
 
 MeForm.prototype.load_model = function (model_name)
@@ -249,41 +251,25 @@ MeForm.prototype.load_model = function (model_name)
 }
 
 
-MeForm.prototype.render_model_old = function ()
-{
-  html='<table class="table table-borderless" id="form-'+this.divId+'">'
-  html+='<colgroup><col width="50%"><col width="5%"><col width="45%"></colgroup>'
-  html+='<tbody id="fields_'+this.divId+'">'
-  for (i in this.model)
-  {
-    html+='<tr>'
-    html+='<th>'+this.model[i].label+'</th>'
-    html+='<td></td>'
-    html+='<td><input type="text"></td>'
-    html+='</tr>'
-  }
-  html+='</tbody>'
-  html+='</table>'
-  this.html=html;
-
-  $("div#"+this.divId).html(this.html);
-
-}
-
-
 MeForm.prototype.render_model = function ()
 {
   html='<form id="form-'+this.divId+'">'
   for (i in this.model)
   {
     fmodel=this.model[i]
-    html+=FormWidget[fmodel.class](fmodel)
-    html+='</div>'
+    var widget=FormWidget[fmodel.class](this,fmodel)
+    html+=widget.html
+    this.after_render_calls.push(widget.after_render)
   }
   html+='</form>'
   this.html=html;
 
   $("div#"+this.divId).html(this.html);
+
+  for (c in this.after_render_calls)
+  {
+    this.after_render_calls[c]()
+  }
 }
 
 
@@ -291,26 +277,122 @@ MeForm.prototype.render_model = function ()
 
 FormWidget={}
 
-FormWidget['text']=function(f){
-  html='<div class="form-group row">'
-  html+='<label for="'+f.field+'" class="col-sm-2 col-form-label">'
-  html+=f.label+'</label>'
-  html+='<div class="col-sm-'+f.width+'">'
-  html+='<input type="text" class="form-control" id="'+f.field+'">'
-  html+='</div></div>'
-  return html
+
+FormWidget['text']=function(form,f)
+{
+  idf=form.divId+'_'+f.field
+  result={
+      'html':'<div class="form-group row">'
+             +'<label for="'+f.field+'" class="col-sm-2 col-form-label">'
+             +f.label+'</label>'
+             +'<div class="col-sm-'+f.width+'">'
+             +'<input type="text" class="form-control" id="'+idf+'">'
+             +'</div></div>',
+      'after_render':function(a=form.divId,b=f.field){console.log(a,b)}
+    }
+  return result
 }
 
 
-FormWidget['select']=function(f){
-  html='<div class="form-group row">'
-  html+='<label for="'+f.field+'" class="col-sm-2 col-form-label">'
-  html+=f.label+'</label>'
-  html+='<div class="col-sm-'+f.width+'">'
-  html+='<select class="form-control" id="'+f.field+'">'
+FormWidget['select']=function(form,f)
+{
+  idf=form.divId+'_'+f.field
+  result={}
+  result['html']='<div class="form-group row">'
+                +'<label for="'+f.field+'" class="col-sm-2 col-form-label">'
+                +f.label+'</label>'
+                +'<div class="col-sm-'+f.width+'">'
+                +'<select class="form-control" id="'+idf+'">'
   for (o in f.values){
-    html+='<option value="'+f.values[o]['value']+'">'+f.values[o]['text']+'</option>'
+    result.html+='<option value="'+f.values[o]['value']+'">'+f.values[o]['text']+'</option>'
   }
-  html+='</select></div></div>'
-  return html
+  result.html+='</select></div></div>'
+  result['after_render']=function(){console.log('select')}
+  return result
+}
+
+
+FormWidget['flowchart']=function(form,f)
+{
+  idf=form.divId+'_'+f.field
+  result={}
+  result['html']='<div class="form-group row">'
+                +'<label for="'+f.field+'" class="col-sm-2 col-form-label">'
+                +f.label+'</label>'
+                +'<div class="col-sm-'+f.width+'">'
+                +'<div class="input-group mb-1">'
+                +'<div class="input-group-prepend">'
+                +'<button class="btn btn-outline-secondary" type="button">Aggiungi</button>'
+                +'</div>'
+                +'<input type="text" class="form-control col-sm3">'
+                +'<a class="btn btn-outline-secondary d-inline align-middle"'
+                +'href="#" onclick="edit_node()" role="button">Modifica</a></div>'
+                +'<div class=form-control>'
+                +'<div id="'+idf+'"></div>'
+                +'</div></div></div>'
+
+  result['after_render']=function()
+      { var nodes = new vis.DataSet([
+         {id: 1, label: 'Sviluppo',     shape:'box'},
+         {id: 2, label: 'Preparazione', shape:'box'},
+         {id: 3, label: 'Assiemaggio',  shape:'box'},
+         {id: 4, label: 'Saldatura',    shape:'box'},
+         {id: 5, label: 'Montaggio ',   shape:'box'},
+     ]);
+
+     // create an array with edges
+     var edges = new vis.DataSet([
+         {from: 1, to: 2},
+         {from: 2, to: 3},
+         {from: 3, to: 4},
+         {from: 4, to: 5},
+     ]);
+
+     // create a network
+     var container = document.getElementById(idf);
+
+     // provide the data in the vis format
+     var data = {
+         nodes: nodes,
+         edges: edges
+     };
+
+     var options = {
+       height:'250px',
+       layout: {
+         randomSeed: undefined,
+         improvedLayout:true,
+         hierarchical:
+         {
+           enabled:true,
+           levelSeparation: 150,
+           nodeSpacing: 500,
+           treeSpacing: 50,
+           blockShifting: true,
+           edgeMinimization: true,
+           parentCentralization: true,
+           direction: 'LR',        // UD, DU, LR, RL
+           sortMethod: 'directed'   // hubsize, directed
+         },
+       },
+       manipulation: {
+         enabled: true,
+         initiallyActive: false,
+         addNode: true,
+         addEdge: true,
+         editEdge: true,
+         deleteNode: true,
+         deleteEdge: true,
+       },
+       nodes:{
+         shape: 'box',
+       }
+     }
+
+
+     // initialize your network!
+     var network = new vis.Network(container, data, options);
+     network.on("select", function (params) {console.log('select Event:', params);})
+   }
+  return result
 }
