@@ -223,6 +223,7 @@ function MeForm(divId)
   this.model=[]
   this.html='<div id='+this.divId+'><h3>Form of '+this.divId+'</h3></div>'
   this.values=[]
+  this.fields={}
   this.after_render_calls=[]
   this.after_rendering_callback=function(){console.log('rendered')}
 }
@@ -257,6 +258,7 @@ MeForm.prototype.render_model = function ()
   for (i in this.model)
   {
     fmodel=this.model[i]
+    this.fields[fmodel.field]={'values':0}
     var widget=FormWidget[fmodel.class](this,fmodel)
     html+=widget.html
     this.after_render_calls.push(widget.after_render)
@@ -322,36 +324,20 @@ FormWidget['flowchart']=function(form,f)
                 +'<div class="col-sm-'+f.width+'">'
                 +'<div class="input-group mb-1">'
                 +'<div class="input-group-prepend">'
-                +'<button class="btn btn-outline-secondary" type="button">Aggiungi</button>'
+                +'<button class="btn btn-outline-secondary"'
+                +' onclick="add_node_'+f.field+'()" type="button">Aggiungi</button>'
                 +'</div>'
-                +'<input type="text" class="form-control col-sm3">'
+                +'<input type="text" class="form-control col-sm3" id="'+idf+'_add">'
                 +'<a class="btn btn-outline-secondary d-inline align-middle"'
                 +'href="#" onclick="edit_node()" role="button">Modifica</a></div>'
                 +'<div class=form-control>'
                 +'<div id="'+idf+'"></div>'
                 +'</div></div></div>'
 
-  result['after_render']=function()
-      { var nodes = new vis.DataSet([
-         {id: 1, label: 'Sviluppo',     shape:'box'},
-         {id: 2, label: 'Preparazione', shape:'box'},
-         {id: 3, label: 'Assiemaggio',  shape:'box'},
-         {id: 4, label: 'Saldatura',    shape:'box'},
-         {id: 5, label: 'Montaggio ',   shape:'box'},
-     ]);
-
-     // create an array with edges
-     var edges = new vis.DataSet([
-         {from: 1, to: 2},
-         {from: 2, to: 3},
-         {from: 3, to: 4},
-         {from: 4, to: 5},
-     ]);
-
-     // create a network
+  result['after_render']=function(){
+     var nodes=new vis.DataSet(f.values.nodes);
+     var edges=new vis.DataSet(f.values.edges);
      var container = document.getElementById(idf);
-
-     // provide the data in the vis format
      var data = {
          nodes: nodes,
          edges: edges
@@ -366,7 +352,7 @@ FormWidget['flowchart']=function(form,f)
          {
            enabled:true,
            levelSeparation: 150,
-           nodeSpacing: 500,
+           nodeSpacing: 50,
            treeSpacing: 50,
            blockShifting: true,
            edgeMinimization: true,
@@ -389,9 +375,9 @@ FormWidget['flowchart']=function(form,f)
        }
      }
 
-
      // initialize your network!
      var network = new vis.Network(container, data, options);
+     form.fields[f.field]={'network':network}
      network.on("select", function (params) {console.log('select Event:', params);})
    }
   return result
