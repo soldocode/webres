@@ -224,8 +224,9 @@ function MeForm(divId)
   this.html='<div id='+this.divId+'><h3>Form of '+this.divId+'</h3></div>'
   this.values=[]
   this.fields={}
-  this.after_render_calls=[]
-  this.after_rendering_callback=function(){console.log('rendered')}
+  this.widgets={}
+  //this.after_render_calls=[]
+  //this.after_rendering_callback=function(){console.log('rendered')}
 }
 
 MeForm.prototype.load_model = function (model_name)
@@ -259,126 +260,127 @@ MeForm.prototype.render_model = function ()
   {
     fmodel=this.model[i]
     this.fields[fmodel.field]={'values':0}
-    var widget=FormWidget[fmodel.class](this,fmodel)
-    html+=widget.html
-    this.after_render_calls.push(widget.after_render)
+    wdg=new FormWidget[fmodel.class](this,fmodel)
+    html+=wdg.html
+    this.widgets[wdg.id]=wdg
   }
   html+='</form>'
   this.html=html;
 
   $("div#"+this.divId).html(this.html);
 
-  for (c in this.after_render_calls)
-  {
-    this.after_render_calls[c]()
-  }
+  for (w in this.widgets) {this.widgets[w].afterRender()}
 }
 
 
 //////////////////////////////// FormWidget ///////////////////////////////////
 
-FormWidget={}
 
-
-FormWidget['text']=function(form,f)
+function FWidget(form,field)
 {
-  idf=form.divId+'_'+f.field
-  result={
-      'html':'<div class="form-group row">'
-             +'<label for="'+f.field+'" class="col-sm-2 col-form-label">'
-             +f.label+'</label>'
-             +'<div class="col-sm-'+f.width+'">'
-             +'<input type="text" class="form-control" id="'+idf+'">'
-             +'</div></div>',
-      'after_render':function(a=form.divId,b=f.field){console.log(a,b)}
-    }
-  return result
+  this.form=form
+  this.model=field
+  this.id=form.divId+'_'+field.field
+  this.class=field.class
+  this.html=''
 }
 
 
-FormWidget['select']=function(form,f)
+function FWText(form,field)
 {
-  idf=form.divId+'_'+f.field
-  result={}
-  result['html']='<div class="form-group row">'
-                +'<label for="'+f.field+'" class="col-sm-2 col-form-label">'
-                +f.label+'</label>'
-                +'<div class="col-sm-'+f.width+'">'
-                +'<select class="form-control" id="'+idf+'">'
+  FWidget.call(this,form,field);
+  this.html='<div class="form-group row">'
+             +'<label for="'+this.model.field+'" class="col-sm-2 col-form-label">'
+             +this.model.label+'</label>'
+             +'<div class="col-sm-'+this.model.width+'">'
+             +'<input type="text" class="form-control" id="'+this.id+'">'
+             +'</div></div>'
+}
+
+FWText.prototype.afterRender=function(){console.log(this.id + ' created')}
+
+function FWSelect(form,f)
+{
+  FWidget.call(this,form,f);
+  this.html='<div class="form-group row">'
+            +'<label for="'+f.field+'" class="col-sm-2 col-form-label">'
+            +f.label+'</label>'
+            +'<div class="col-sm-'+f.width+'">'
+            +'<select class="form-control" id="'+this.id+'">'
   for (o in f.values){
-    result.html+='<option value="'+f.values[o]['value']+'">'+f.values[o]['text']+'</option>'
+    this.html+='<option value="'+f.values[o]['value']+'">'+f.values[o]['text']+'</option>'
   }
-  result.html+='</select></div></div>'
-  result['after_render']=function(){console.log('select')}
-  return result
+  this.html+='</select></div></div>'
 }
 
+FWSelect.prototype.afterRender=function(){console.log('select widget created')}
 
-FormWidget['flowchart']=function(form,f)
+function FWFlowchart(form,f)
 {
-  idf=form.divId+'_'+f.field
-  result={}
-  result['html']='<div class="form-group row">'
-                +'<label for="'+f.field+'" class="col-sm-2 col-form-label">'
-                +f.label+'</label>'
-                +'<div class="col-sm-'+f.width+'">'
-                +'<div class="input-group mb-1">'
-                +'<div class="input-group-prepend">'
-                +'<button class="btn btn-outline-secondary"'
-                +' onclick="add_node_'+f.field+'()" type="button">Aggiungi</button>'
-                +'</div>'
-                +'<input type="text" class="form-control col-sm3" id="'+idf+'_add">'
-                +'<a class="btn btn-outline-secondary d-inline align-middle"'
-                +'href="#" onclick="edit_node()" role="button">Modifica</a></div>'
-                +'<div class=form-control>'
-                +'<div id="'+idf+'"></div>'
-                +'</div></div></div>'
+  FWidget.call(this,form,f);
+  this.html='<div class="form-group row">'
+       +'<label for="'+this.model.field+'" class="col-sm-2 col-form-label">'
+       +this.model.label+'</label>'
+       +'<div class="col-sm-'+this.model.width+'">'
+       +'<div class="input-group mb-1">'
+       +'<div class="input-group-prepend">'
+       +'<button class="btn btn-outline-secondary"'
+       +' onclick="add_node_'+this.model.field+'()" type="button">Aggiungi</button>'
+       +'</div>'
+       +'<input type="text" class="form-control col-sm3" id="'+this.id+'_add">'
+       +'<a class="btn btn-outline-secondary d-inline align-middle"'
+       +'href="#" onclick="edit_node()" role="button">Modifica</a></div>'
+       +'<div class=form-control>'
+       +'<div id="'+this.id+'"></div>'
+       +'</div></div></div>'
+}
 
-  result['after_render']=function(){
-     var nodes=new vis.DataSet(f.values.nodes);
-     var edges=new vis.DataSet(f.values.edges);
-     var container = document.getElementById(idf);
-     var data = {
-         nodes: nodes,
-         edges: edges
-     };
+FWFlowchart.prototype.afterRender=function(){
+   var nodes=new vis.DataSet(this.model.values.nodes);
+   var edges=new vis.DataSet(this.model.values.edges);
+   var container = document.getElementById(this.id);
+   var data = {
+       nodes: nodes,
+       edges: edges
+   };
 
-     var options = {
-       height:'250px',
-       layout: {
-         randomSeed: undefined,
-         improvedLayout:true,
-         hierarchical:
-         {
-           enabled:true,
-           levelSeparation: 150,
-           nodeSpacing: 50,
-           treeSpacing: 50,
-           blockShifting: true,
-           edgeMinimization: true,
-           parentCentralization: true,
-           direction: 'LR',        // UD, DU, LR, RL
-           sortMethod: 'directed'   // hubsize, directed
-         },
+   var options = {
+     height:'250px',
+     layout: {
+       randomSeed: undefined,
+       improvedLayout:true,
+       hierarchical:
+       {
+         enabled:true,
+         levelSeparation: 150,
+         nodeSpacing: 50,
+         treeSpacing: 50,
+         blockShifting: true,
+         edgeMinimization: true,
+         parentCentralization: true,
+         direction: 'LR',        // UD, DU, LR, RL
+         sortMethod: 'directed'   // hubsize, directed
        },
-       manipulation: {
-         enabled: true,
-         initiallyActive: false,
-         addNode: true,
-         addEdge: true,
-         editEdge: true,
-         deleteNode: true,
-         deleteEdge: true,
-       },
-       nodes:{
-         shape: 'box',
-       }
+     },
+     manipulation: {
+       enabled: true,
+       initiallyActive: false,
+       addNode: true,
+       addEdge: true,
+       editEdge: true,
+       deleteNode: true,
+       deleteEdge: true,
+     },
+     nodes:{
+       shape: 'box',
      }
-
-     // initialize your network!
-     var network = new vis.Network(container, data, options);
-     form.fields[f.field]={'network':network}
-     network.on("select", function (params) {console.log('select Event:', params);})
    }
-  return result
+
+   var network = new vis.Network(container, data, options);
+   this.form.fields[this.model.field]={'network':network}
+ }
+
+FormWidget={'text':FWText,
+           'select':FWSelect,
+           'flowchart':FWFlowchart,
 }
