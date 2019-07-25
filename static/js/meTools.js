@@ -225,8 +225,6 @@ function MeForm(divId)
   this.values=[]
   this.fields={}
   this.widgets={}
-  //this.after_render_calls=[]
-  //this.after_rendering_callback=function(){console.log('rendered')}
 }
 
 MeForm.prototype.load_model = function (model_name)
@@ -255,7 +253,7 @@ MeForm.prototype.load_model = function (model_name)
 
 MeForm.prototype.render_model = function ()
 {
-  html='<form id="form-'+this.divId+'">'
+  var html='<form id="form-'+this.divId+'">'
   for (i in this.model)
   {
     fmodel=this.model[i]
@@ -267,7 +265,11 @@ MeForm.prototype.render_model = function ()
   html+='</form>'
   this.html=html;
 
-  $("div#"+this.divId).html(this.html);
+  var script='<script id="form-'+this.divId+'">'
+  script+='</script>'
+
+  $("div#"+this.divId).html(this.html+script);
+
 
   for (w in this.widgets) {this.widgets[w].afterRender()}
 }
@@ -283,6 +285,7 @@ function FWidget(form,field)
   this.id=form.divId+'_'+field.field
   this.class=field.class
   this.html=''
+  this.scripts={}
 }
 
 
@@ -325,7 +328,7 @@ function FWFlowchart(form,f)
        +'<div class="input-group mb-1">'
        +'<div class="input-group-prepend">'
        +'<button class="btn btn-outline-secondary"'
-       +' onclick="add_node_'+this.model.field+'()" type="button">Aggiungi</button>'
+       +'onclick="FWFlowchartAddNode(\''+form.divId+'\',\''+this.model.field+'\')" type="button">Aggiungi</button>'
        +'</div>'
        +'<input type="text" class="form-control col-sm3" id="'+this.id+'_add">'
        +'<a class="btn btn-outline-secondary d-inline align-middle"'
@@ -377,8 +380,33 @@ FWFlowchart.prototype.afterRender=function(){
    }
 
    var network = new vis.Network(container, data, options);
+   network.on("selectNode",function(){console.log('cambiatto!!')})
    this.form.fields[this.model.field]={'network':network}
  }
+
+ function FWFlowchartAddNode(container,field)
+ {
+        wdg=eval(container+'_form.fields.'+field)
+        n=wdg.network
+        var nodes=n.body.data.nodes._data
+        var edges=n.body.data.edges._data
+        nn=[]
+        ee=[]
+        idn=0
+        for (i in nodes)
+        {
+          nn.push(nodes[i])
+          if (nodes[i].id>idn){idn=nodes[i].id}
+        }
+        for (i in edges){ee.push(edges[i])}
+        nn.push({id:idn+1,label:$("#"+container+"_workflow_add").val()})
+        ee.push({from:idn, to:idn+1})
+        n.setData({nodes:new vis.DataSet(nn),edges:new vis.DataSet(ee)})
+        wdg.values={nodes:nn,edges:ee}
+
+ }
+
+
 
 FormWidget={'text':FWText,
            'select':FWSelect,
