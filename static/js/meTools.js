@@ -222,7 +222,7 @@ function MeForm(divId)
   this.divId=divId
   this.model=[]
   this.html='<div id='+this.divId+'><h3>Form of '+this.divId+'</h3></div>'
-  this.values=[]
+  //this.values=[]
   this.fields={}
   this.widgets={}
 }
@@ -257,7 +257,7 @@ MeForm.prototype.render_model = function ()
   for (i in this.model)
   {
     fmodel=this.model[i]
-    this.fields[fmodel.field]={'values':0}
+    this.fields[fmodel.field]={}
     wdg=new FormWidget[fmodel.class](this,fmodel)
     html+=wdg.html
     this.widgets[wdg.id]=wdg
@@ -285,7 +285,7 @@ function FWidget(form,field)
   this.id=form.divId+'_'+field.field
   this.class=field.class
   this.html=''
-  this.scripts={}
+  //this.scripts={}
 }
 
 
@@ -296,11 +296,22 @@ function FWText(form,field)
              +'<label for="'+this.model.field+'" class="col-sm-2 col-form-label">'
              +this.model.label+'</label>'
              +'<div class="col-sm-'+this.model.width+'">'
-             +'<input type="text" class="form-control" id="'+this.id+'">'
+             +'<input type="text" onchange="FWTextOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
+             +'class="form-control" id="'+this.id+'">'
              +'</div></div>'
 }
 
-FWText.prototype.afterRender=function(){console.log(this.id + ' created')}
+FWText.prototype.afterRender=function()
+{
+  this.form.fields[this.model.field]={'value':''}
+}
+
+function FWTextOnChange(container,field)
+{
+    wdg=eval(container+'_form.fields.'+field)
+    wdg.value=$("#"+container+"_"+field).val()
+}
+
 
 function FWSelect(form,f)
 {
@@ -309,14 +320,24 @@ function FWSelect(form,f)
             +'<label for="'+f.field+'" class="col-sm-2 col-form-label">'
             +f.label+'</label>'
             +'<div class="col-sm-'+f.width+'">'
-            +'<select class="form-control" id="'+this.id+'">'
+            +'<select onchange="FWSelectOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
+            +'class="form-control" id="'+this.id+'">'
   for (o in f.values){
     this.html+='<option value="'+f.values[o]['value']+'">'+f.values[o]['text']+'</option>'
   }
   this.html+='</select></div></div>'
 }
 
-FWSelect.prototype.afterRender=function(){console.log('select widget created')}
+FWSelect.prototype.afterRender=function()
+{
+  this.form.fields[this.model.field]={'value':''}
+}
+
+function FWSelectOnChange(container,field)
+{
+    wdg=eval(container+'_form.fields.'+field)
+    wdg.value=$("#"+container+"_"+field).val()
+}
 
 function FWFlowchart(form,f)
 {
