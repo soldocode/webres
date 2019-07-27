@@ -285,6 +285,7 @@ function FWidget(form,field)
   this.id=form.divId+'_'+field.field
   this.class=field.class
   this.html=''
+  this.json=null
   //this.scripts={}
 }
 
@@ -296,7 +297,7 @@ function FWText(form,field)
              +'<label for="'+this.model.field+'" class="col-sm-2 col-form-label">'
              +this.model.label+'</label>'
              +'<div class="col-sm-'+this.model.width+'">'
-             +'<input type="text" onchange="FWTextOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
+             +'<input type="text" onchange="FWTextOnChange(\''+form.divId+'\',\''+this.model.field+'\',event)"'
              +'class="form-control" id="'+this.id+'">'
              +'</div></div>'
 }
@@ -306,10 +307,13 @@ FWText.prototype.afterRender=function()
   this.form.fields[this.model.field]={'value':''}
 }
 
-function FWTextOnChange(container,field)
+function FWTextOnChange(container,field,event)
 {
+    console.log($(this));
+    console.log($(event));
     wdg=eval(container+'_form.fields.'+field)
     wdg.value=$("#"+container+"_"+field).val()
+    wdg.json=wdg.value
 }
 
 
@@ -337,7 +341,10 @@ function FWSelectOnChange(container,field)
 {
     wdg=eval(container+'_form.fields.'+field)
     wdg.value=$("#"+container+"_"+field).val()
+    wdg.json=wdg.value
 }
+
+
 
 function FWFlowchart(form,f)
 {
@@ -351,7 +358,7 @@ function FWFlowchart(form,f)
        +'<button class="btn btn-outline-secondary"'
        +'onclick="FWFlowchartAddNode(\''+form.divId+'\',\''+this.model.field+'\')" type="button">Aggiungi</button>'
        +'</div>'
-       +'<input type="text" class="form-control col-sm3" id="'+this.id+'_add">'
+       +'<input type="text" class="form-control col-sm-3" id="'+this.id+'_add">'
        +'<a class="btn btn-outline-secondary d-inline align-middle"'
        +'href="#" onclick="edit_node()" role="button">Modifica</a></div>'
        +'<div class=form-control>'
@@ -423,13 +430,98 @@ FWFlowchart.prototype.afterRender=function(){
         nn.push({id:idn+1,label:$("#"+container+"_workflow_add").val()})
         ee.push({from:idn, to:idn+1})
         n.setData({nodes:new vis.DataSet(nn),edges:new vis.DataSet(ee)})
-        wdg.values={nodes:nn,edges:ee}
-
+        wdg.value={nodes:nn,edges:ee}
+        wdg.json=wdg.values
  }
 
+
+
+function FWRangeNumber(form,f)
+// permette di definire un range a cui associare un numero
+{
+  FWidget.call(this,form,f);
+  this.html='<div class="form-group row">'
+       +'<label for="'+this.model.field+'" class="col-sm-2 col-form-label">'
+       +this.model.label+'</label>'
+       +'<div class="col-sm-8" id="'+this.id+'" tcount=0>'
+
+       +'<div class="form-group row" row="0" id="'+this.id+'_0">'
+       +'<label for="'+f.field+'" class="col-sm-2 col-form-label">fino a</label>'
+       +'<div class="col-md-3">'
+       +'<input type="text" onchange="FWRangeNumberOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
+       +'class="form-control" id="'+this.id+'_range_0">'
+       +'</div>'
+       +'<p class="col-sm-1 col-form-label">vale</p>'
+       +'<div class="col-md-4">'
+       +'<input type="text" onchange="FWRangeNumberOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
+       +'class="form-control" id="'+this.id+'_value_0">'
+       +'</div>'
+       +'<div class="col-form-label col-md-1">'
+       +'<a class="btn btn-outline-secondary d-inline align-middle col-sm-1"'
+       +'href="#" onclick="FWRangeNumberInsertRow'
+       +'(\''+form.divId+'\',\''+this.model.field+'\',\''+0+'\')" role="button">+</a>'
+       +'</div>'
+       +'</div>'
+
+       +'<div class="form-group row " row="last" id="'+this.id+'_last">'
+       +'<label for="'+f.field+'" class="col-sm-5 col-form-label">oltre a 1000</label>'
+       +'<p class="col-sm-1 col-form-label">vale</p>'
+       +'<div class="col-md-4">'
+        +'<input type="text" onchange="FWRangeNumberOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
+        +'class="form-control" id="'+this.id+'">'
+       +'</div>'
+       +'</div>'
+
+       +'</div></div>'
+}
+
+FWRangeNumber.prototype.afterRender=function()
+{
+  this.form.fields[this.model.field]={'value':{1:0}}
+}
+
+
+function FWRangeNumberOnChange(container,field)
+{
+    wdg=eval(container+'_form.fields.'+field)
+    wdg.value=$("#"+container+"_"+field).val()
+    wdg.json=wdg.value
+}
+
+function FWRangeNumberInsertRow(container,field,count)
+{
+    wdg=eval(container+'_form.fields.'+field)
+    wdg_id=container+'_'+field
+    step=1
+    tcount=parseInt($("#"+container).attr("tcount"))
+    newcount=parseInt(count)+1
+    range_value=parseFloat($("input#"+wdg_id+"_range_"+count).val())+step
+    html= '<div class="form-group row" row='+newcount+' id="'+wdg_id+'_'+newcount+'">'
+     +'<label for="'+field+'" class="col-sm-2 col-form-label">da '+range_value
+     +' fino a</label>'
+     +'<div class="col-md-3">'
+      +'<input type="text" onchange="FWRangeNumberOnChange(\''+container+'\',\''+field+'\')"'
+      +'class="form-control" id="'+wdg_id+'_range_'+newcount+'">'
+     +'</div>'
+     +'<p class="col-sm-1 col-form-label">vale</p>'
+     +'<div class="col-md-4">'
+      +'<input type="text" onchange="FWRangeNumberOnChange(\''+container+'\',\''+field+'\')"'
+      +'class="form-control"id="'+wdg_id+'_value_'+newcount+'">'
+     +'</div>'
+     +'<div class="btn-group" role="group">'
+     +'<button type="button" class="btn  btn-outline-secondary">-</button>'
+     +'<button type="button" class="btn  btn-outline-secondary" '
+     +'onclick="FWRangeNumberInsertRow(\''+container+'\',\''+field+'\',\''+newcount+'\')">+</button>'
+     +'</div>'
+     +'</div>'
+
+    $("div#"+wdg_id+"_"+count).after(html)
+    console.log("#"+wdg_id+"_"+count)
+}
 
 
 FormWidget={'text':FWText,
            'select':FWSelect,
            'flowchart':FWFlowchart,
+           'rangeNumber':FWRangeNumber,
 }
