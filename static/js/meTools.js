@@ -443,28 +443,30 @@ function FWRangeNumber(form,f)
   this.html='<div class="form-group row">'
        +'<label for="'+this.model.field+'" class="col-sm-2 col-form-label">'
        +this.model.label+'</label>'
-       +'<div class="col-sm-8" id="'+this.id+'" tcount=0>'
+       +'<div class="col-sm-8" id="'+this.id+'" tcount=1>'
 
        +'<div class="form-group row" row="0" id="'+this.id+'_0">'
        +'<label for="'+f.field+'" class="col-sm-2 col-form-label">fino a</label>'
        +'<div class="col-md-3">'
-       +'<input type="text" onchange="FWRangeNumberOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
+       +'<input type="number" onchange="FWRangeNumberRangeOnChange'
+       +'(\''+form.divId+'\',\''+this.model.field+'\',\''+0+'\')"'
        +'class="form-control" id="'+this.id+'_range_0">'
        +'</div>'
        +'<p class="col-sm-1 col-form-label">vale</p>'
        +'<div class="col-md-4">'
-       +'<input type="text" onchange="FWRangeNumberOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
+       +'<input type="number" onchange="FWRangeNumberOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
        +'class="form-control" id="'+this.id+'_value_0">'
        +'</div>'
        +'<div class="col-form-label col-md-1">'
-       +'<a class="btn btn-outline-secondary d-inline align-middle col-sm-1"'
-       +'href="#" onclick="FWRangeNumberInsertRow'
-       +'(\''+form.divId+'\',\''+this.model.field+'\',\''+0+'\')" role="button">+</a>'
+       +'<a class="btn btn-outline-secondary d-inline align-middle col-sm-1" '
+       +'id="'+this.id+'_0" '
+       +'onclick="FWRangeNumberInsertRow'
+       +'(event,\''+form.divId+'\',\''+this.model.field+'\',\''+0+'\')" role="button">+</a>'
        +'</div>'
        +'</div>'
 
-       +'<div class="form-group row " row="last" id="'+this.id+'_last">'
-       +'<label for="'+f.field+'" class="col-sm-5 col-form-label">oltre a 1000</label>'
+       +'<div class="form-group row " row="1" id="'+this.id+'_1">'
+       +'<label for="'+f.field+'" class="col-sm-5 col-form-label" id="'+this.id+'_1">oltre a 1000</label>'
        +'<p class="col-sm-1 col-form-label">vale</p>'
        +'<div class="col-md-4">'
         +'<input type="text" onchange="FWRangeNumberOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
@@ -481,42 +483,83 @@ FWRangeNumber.prototype.afterRender=function()
 }
 
 
-function FWRangeNumberOnChange(container,field)
+function FWRangeNumberOnChange(container,field,count)
 {
     wdg=eval(container+'_form.fields.'+field)
-    wdg.value=$("#"+container+"_"+field).val()
+    wdg.value=$("#"+container+"_"+field+"_"+count).val()
     wdg.json=wdg.value
 }
 
-function FWRangeNumberInsertRow(container,field,count)
+
+function FWRangeNumberRangeOnChange(container,field,count)
 {
     wdg=eval(container+'_form.fields.'+field)
     wdg_id=container+'_'+field
     step=1
-    tcount=parseInt($("#"+container).attr("tcount"))
+    tcount=parseInt($("#"+wdg_id).attr("tcount"))
+    newcount=parseInt(count)+1
+    range_value=parseFloat($("input#"+wdg_id+"_range_"+count).val())+step
+    if (count==tcount-1)
+    {
+      $("label#"+wdg_id+"_"+newcount).text('oltre a '+range_value)
+    }
+    else
+    {
+      $("label#"+wdg_id+"_"+newcount).text('da '+range_value+' fino a')
+    }
+    console.log($("label#"+wdg_id+"_range_"+count).val())
+    console.log("label#"+wdg_id+"_"+(count+1).toString())
+}
+
+
+function FWRangeNumberInsertRow(event,container,field,count)
+{
+    target=$(event.currentTarget)
+    console.log(target[0].id)
+    wdg=eval(container+'_form.fields.'+field)
+    wdg_id=container+'_'+field
+    step=1
+    tcount=parseInt($("#"+wdg_id).attr("tcount"))
     newcount=parseInt(count)+1
     range_value=parseFloat($("input#"+wdg_id+"_range_"+count).val())+step
     html= '<div class="form-group row" row='+newcount+' id="'+wdg_id+'_'+newcount+'">'
-     +'<label for="'+field+'" class="col-sm-2 col-form-label">da '+range_value
-     +' fino a</label>'
+     +'<label for="'+field+'" class="col-sm-2 col-form-label" id="'+wdg_id+'_'+newcount+'">da '
+     +range_value+' fino a'
+     +'</label>'
      +'<div class="col-md-3">'
-      +'<input type="text" onchange="FWRangeNumberOnChange(\''+container+'\',\''+field+'\')"'
-      +'class="form-control" id="'+wdg_id+'_range_'+newcount+'">'
+     +'<input type="number" onchange="FWRangeNumberRangeOnChange(\''+container+'\',\''+field+'\',\''+newcount+'\')"'
+     +'class="form-control" id="'+wdg_id+'_range_'+newcount+'">'
      +'</div>'
      +'<p class="col-sm-1 col-form-label">vale</p>'
      +'<div class="col-md-4">'
-      +'<input type="text" onchange="FWRangeNumberOnChange(\''+container+'\',\''+field+'\')"'
-      +'class="form-control"id="'+wdg_id+'_value_'+newcount+'">'
+     +'<input type="number" onchange="FWRangeNumberOnChange(\''+container+'\',\''+field+'\')"'
+     +'class="form-control"id="'+wdg_id+'_value_'+newcount+'">'
      +'</div>'
      +'<div class="btn-group" role="group">'
      +'<button type="button" class="btn  btn-outline-secondary">-</button>'
      +'<button type="button" class="btn  btn-outline-secondary" '
-     +'onclick="FWRangeNumberInsertRow(\''+container+'\',\''+field+'\',\''+newcount+'\')">+</button>'
+     +'id="'+wdg_id+'_'+newcount+'" '
+     +'onclick="FWRangeNumberInsertRow(event,\''+container+'\',\''+field+'\',\''+newcount+'\')">+</button>'
      +'</div>'
      +'</div>'
 
+    for (i=tcount; i>count; i--)
+    {
+      console.log(i)
+      trg="#"+wdg_id+"_"+i
+      $("div"+trg).attr("row",i+1)
+      $("label"+trg).attr("id",wdg_id+"_"+parseInt(i+1))
+      $("input"+trg).attr("row",i+1)
+      $("div"+trg).attr("id",wdg_id+"_"+parseInt(i+1))
+      $("input"+trg).attr("onchange",
+        '"FWRangeNumberRangeOnChange(\''+container+'\',\''+field+'\',\''+parseInt(i+1)+'\')"')
+      $("button"+trg).attr("onclick",
+        '"FWRangeNumberInsertRow(event,\''+container+'\',\''+field+'\',\''+parseInt(i+1)+'\')"')
+      $("input"+trg).attr("id",wdg_id+"_"+parseInt(i+1))
+      $("button"+trg).attr("id",wdg_id+"_"+parseInt(i+1))
+    }
     $("div#"+wdg_id+"_"+count).after(html)
-    console.log("#"+wdg_id+"_"+count)
+    $("div#"+wdg_id).attr("tcount",tcount+1)
 }
 
 
