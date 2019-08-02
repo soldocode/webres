@@ -317,6 +317,35 @@ function FWTextOnChange(container,field,event)
 }
 
 
+
+function FWNumber(form,field)
+{
+  FWidget.call(this,form,field);
+  this.html='<div class="form-group row">'
+             +'<label for="'+this.model.field+'" class="col-sm-2 col-form-label">'
+             +this.model.label+'</label>'
+             +'<div class="col-sm-'+this.model.width+'">'
+             +'<input type="number" onchange="FWNumberOnChange(\''+form.divId+'\',\''+this.model.field+'\',event)"'
+             +'class="form-control" id="'+this.id+'">'
+             +'</div></div>'
+}
+
+FWNumber.prototype.afterRender=function()
+{
+  this.form.fields[this.model.field]={'value':''}
+}
+
+function FWNumberOnChange(container,field,event)
+{
+    console.log($(this));
+    console.log($(event));
+    wdg=eval(container+'_form.fields.'+field)
+    wdg.value=$("#"+container+"_"+field).val()
+    wdg.json=wdg.value
+}
+
+
+
 function FWSelect(form,f)
 {
   FWidget.call(this,form,f);
@@ -465,12 +494,12 @@ function FWRangeNumber(form,f)
        +'</div>'
        +'</div>'
 
-       +'<div class="form-group row " row="1" id="'+this.id+'_1">'
+       +'<div class="form-group row" row="1" id="'+this.id+'_1">'
        +'<label for="'+f.field+'" class="col-sm-5 col-form-label" id="'+this.id+'_1">oltre a 1000</label>'
        +'<p class="col-sm-1 col-form-label">vale</p>'
        +'<div class="col-md-4">'
         +'<input type="text" onchange="FWRangeNumberOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
-        +'class="form-control" id="'+this.id+'">'
+        +'class="form-control" id="'+this.id+'_value_1">'
        +'</div>'
        +'</div>'
 
@@ -483,10 +512,23 @@ FWRangeNumber.prototype.afterRender=function()
 }
 
 
-function FWRangeNumberOnChange(container,field,count)
+function FWRangeNumberOnChange(container,field)
 {
     wdg=eval(container+'_form.fields.'+field)
-    wdg.value=$("#"+container+"_"+field+"_"+count).val()
+    wdg_id=container+'_'+field
+    tcount=parseInt($("#"+wdg_id).attr("tcount"))
+    var value={}
+    value[0]=$("input#"+wdg_id+"_value_0").val()
+    for (i=0; i<=tcount; i++)
+    {
+      console.log(i)
+      trg="#"+wdg_id+"_"+i
+      r=$("input#"+wdg_id+"_range_"+parseInt(i)).val()
+      v=$("input#"+wdg_id+"_value_"+parseInt(i+1)).val()
+      value[r]=v
+    }
+
+    wdg.value=value
     wdg.json=wdg.value
 }
 
@@ -507,15 +549,15 @@ function FWRangeNumberRangeOnChange(container,field,count)
     {
       $("label#"+wdg_id+"_"+newcount).text('da '+range_value+' fino a')
     }
-    console.log($("label#"+wdg_id+"_range_"+count).val())
-    console.log("label#"+wdg_id+"_"+(count+1).toString())
+    //console.log($("label#"+wdg_id+"_range_"+count).val())
+
 }
 
 
 function FWRangeNumberInsertRow(event,container,field,count)
 {
     target=$(event.currentTarget)
-    console.log(target[0].id)
+    //console.log(target[0].id)
     wdg=eval(container+'_form.fields.'+field)
     wdg_id=container+'_'+field
     step=1
@@ -545,18 +587,22 @@ function FWRangeNumberInsertRow(event,container,field,count)
 
     for (i=tcount; i>count; i--)
     {
-      console.log(i)
+      //console.log(i)
       trg="#"+wdg_id+"_"+i
-      $("div"+trg).attr("row",i+1)
+      //console.log("input#"+wdg_id+"_range_"+parseInt(i))
       $("label"+trg).attr("id",wdg_id+"_"+parseInt(i+1))
-      $("input"+trg).attr("row",i+1)
-      $("div"+trg).attr("id",wdg_id+"_"+parseInt(i+1))
-      $("input"+trg).attr("onchange",
-        '"FWRangeNumberRangeOnChange(\''+container+'\',\''+field+'\',\''+parseInt(i+1)+'\')"')
+      //$("input"+trg).attr("row",i+1)
+      $("input#"+wdg_id+"_range_"+parseInt(i)).attr("onchange",
+        'FWRangeNumberRangeOnChange(\''+container+'\',\''+field+'\',\''+parseInt(i+1)+'\')')
+      $("input#"+wdg_id+"_value_"+parseInt(i)).attr("onchange",
+        'FWRangeNumberOnChange(\''+container+'\',\''+field+'\')')
       $("button"+trg).attr("onclick",
-        '"FWRangeNumberInsertRow(event,\''+container+'\',\''+field+'\',\''+parseInt(i+1)+'\')"')
-      $("input"+trg).attr("id",wdg_id+"_"+parseInt(i+1))
+        'FWRangeNumberInsertRow(event,\''+container+'\',\''+field+'\',\''+parseInt(i+1)+'\')')
+      $("input#"+wdg_id+"_range_"+parseInt(i)).attr("id",wdg_id+"_range_"+parseInt(i+1))
+      $("input#"+wdg_id+"_value_"+parseInt(i)).attr("id",wdg_id+"_value_"+parseInt(i+1))
       $("button"+trg).attr("id",wdg_id+"_"+parseInt(i+1))
+      $("div"+trg).attr("row",i+1)
+      $("div"+trg).attr("id",wdg_id+"_"+parseInt(i+1))
     }
     $("div#"+wdg_id+"_"+count).after(html)
     $("div#"+wdg_id).attr("tcount",tcount+1)
@@ -564,7 +610,8 @@ function FWRangeNumberInsertRow(event,container,field,count)
 
 
 FormWidget={'text':FWText,
-           'select':FWSelect,
-           'flowchart':FWFlowchart,
-           'rangeNumber':FWRangeNumber,
+            'number':FWNumber,
+            'select':FWSelect,
+            'flowchart':FWFlowchart,
+            'rangeNumber':FWRangeNumber,
 }
