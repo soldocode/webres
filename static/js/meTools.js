@@ -175,7 +175,8 @@ MeIndex.prototype.render_content = function()
       switch (cls)
       {
         case 'link':
-          html+='<a class="link text-decoration-none" href="">'
+          html+='<a class="link text-decoration-none" '
+          html+='href="'+this.model[c].url+'?id='+row.id+'">'
           html+='<b>'+row[field]+'</b>'
           html+='</a>'
           break;
@@ -438,7 +439,7 @@ FWFlowchart.prototype.afterRender=function(){
 
    var network = new vis.Network(container, data, options);
    network.on("selectNode",function(){console.log('cambiatto!!')})
-   this.form.fields[this.model.field]={'network':network}
+   this.form.fields[this.model.field]={'network':network,'node_field':this.model.node_field}
  }
 
  function FWFlowchartAddNode(container,field)
@@ -456,11 +457,26 @@ FWFlowchart.prototype.afterRender=function(){
           if (nodes[i].id>idn){idn=nodes[i].id}
         }
         for (i in edges){ee.push(edges[i])}
-        nn.push({id:idn+1,label:$("#"+container+"_workflow_add").val()})
+        nn.push({id:idn+1,label:$("#"+container+"_"+field+"_add").val()})
         ee.push({from:idn, to:idn+1})
         n.setData({nodes:new vis.DataSet(nn),edges:new vis.DataSet(ee)})
         wdg.value={nodes:nn,edges:ee}
-        wdg.json=wdg.values
+        json_node={}
+        json_flow={}
+        for (i in nodes)
+        {
+          json_node[nodes[i].id]={'Title':nodes[i].label}
+          json_flow[nodes[i].id]=[]
+        }
+        console.log(json_flow)
+        for (i in edges)
+        {
+          console.log(edges[i].to)
+          json_flow[edges[i].to].push(edges[i].from)
+        }
+        wdg.json={}
+        wdg.json[wdg.node_field]=json_node
+        wdg.json['Flow']=json_flow
  }
 
 
@@ -518,7 +534,7 @@ function FWRangeNumberOnChange(container,field)
     wdg_id=container+'_'+field
     tcount=parseInt($("#"+wdg_id).attr("tcount"))
     var value={}
-    value[0]=$("input#"+wdg_id+"_value_0").val()
+    value[0]=$("input#"+wdg_id+"_value_0")  .val()
     for (i=0; i<=tcount; i++)
     {
       console.log(i)
