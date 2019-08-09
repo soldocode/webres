@@ -142,7 +142,7 @@ MeIndex.prototype.load_content = function(rec_min,rec_range,filters)
   values.rec_range=rec_range
   values.filters=filters
   var this_obj=this
-  $.ajax({url:this.filter_loader+'load_content',
+  $.ajax({url:this.app_url+'load_content',
           type:"POST",
           data:values,
           dataType: "json",
@@ -226,6 +226,7 @@ function MeForm(divId)
   //this.values=[]
   this.fields={}
   this.widgets={}
+  this.values={}
 }
 
 MeForm.prototype.load_model = function (model_name)
@@ -276,6 +277,33 @@ MeForm.prototype.render_model = function ()
 }
 
 
+
+MeForm.prototype.load_content = function(model_name,id)
+{
+  values={}
+  values.id=id
+  var this_obj=this
+  $.ajax({url:this.app_url+'load_content_'+model_name,
+          type:"POST",
+          data:values,
+          dataType: "json",
+          success:function(result)
+           {
+             console.log('load_content call succsefull...')
+             for (v in result.values)
+             {
+               this_obj.fields[v].value=result.values[v]
+             }
+             //this_obj.values=result.values
+           },
+          complete:function(result)
+          {
+            console.log('load_content call completed...')
+          },
+        });
+}
+
+
 //////////////////////////////// FormWidget ///////////////////////////////////
 
 
@@ -289,6 +317,16 @@ function FWidget(form,field)
   this.json=null
   //this.scripts={}
 }
+
+
+function FWHidden(form,field)
+{
+  FWidget.call(this,form,field);
+  this.html='<div hidden="true" class="form-group row"></div>'
+
+}
+
+FWText.prototype.afterRender=function(){}
 
 
 function FWText(form,field)
@@ -357,7 +395,7 @@ function FWSelect(form,f)
             +'<select onchange="FWSelectOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
             +'class="form-control" id="'+this.id+'">'
   for (o in f.values){
-    this.html+='<option value="'+f.values[o]['value']+'">'+f.values[o]['text']+'</option>'
+    this.html+='<option value="'+f.values[o][1]+'">'+f.values[o][0]+'</option>'
   }
   this.html+='</select></div></div>'
 }
@@ -630,4 +668,5 @@ FormWidget={'text':FWText,
             'select':FWSelect,
             'flowchart':FWFlowchart,
             'rangeNumber':FWRangeNumber,
+            'hidden':FWHidden,
 }
