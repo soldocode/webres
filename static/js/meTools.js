@@ -294,7 +294,14 @@ MeForm.prototype.load_content = function(model_name,id)
              {
                this_obj.fields[v].value=result.values[v]
              }
-             //this_obj.values=result.values
+             for (w in this_obj.widgets)
+             {
+               console.log(w)
+               vv=this_obj.fields[this_obj.widgets[w].model.field].value
+               //vv=this_obj.field[this_obj.widgets[w]].value
+               console.log(vv)
+               $("#"+w).val(vv)
+             }
            },
           complete:function(result)
           {
@@ -326,7 +333,8 @@ function FWHidden(form,field)
 
 }
 
-FWText.prototype.afterRender=function(){}
+FWHidden.prototype.afterRender=function(){}
+
 
 
 function FWText(form,field)
@@ -663,10 +671,32 @@ function FWRangeNumberInsertRow(event,container,field,count)
 }
 
 
+function FWSwitch(form,f)
+{
+  FWidget.call(this,form,f);
+  this.html='<div class="form-group row">'
+         +'<label for="'+this.model.field+'" class="col-sm-2 col-form-label">'
+         +this.model.label+'</label>'
+         +'<div class="col-sm-5">'
+         +'<input class="form-control" id="'+this.id+'" type="checkbox" data-toggle="toggle" '
+         +'data-on="Ready" data-off="Not Ready" >'
+         +'</div></div>'
+}
+
+FWSwitch.prototype.afterRender=function()
+{
+  $('#'+this.id).bootstrapToggle();
+}
+
+function FWSwitchOnChange(container,field)
+{}
+
+
 FormWidget={'text':FWText,
             'number':FWNumber,
             'select':FWSelect,
             'flowchart':FWFlowchart,
             'rangeNumber':FWRangeNumber,
+            'switch':FWSwitch,
             'hidden':FWHidden,
 }
