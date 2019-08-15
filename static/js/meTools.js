@@ -223,7 +223,6 @@ function MeForm(divId)
   this.divId=divId
   this.model=[]
   this.html='<div id='+this.divId+'><h3>Form of '+this.divId+'</h3></div>'
-  //this.values=[]
   this.fields={}
   this.widgets={}
   this.values={}
@@ -296,19 +295,28 @@ MeForm.prototype.load_content = function(model_name,id)
              }
              for (w in this_obj.widgets)
              {
-               console.log(w)
-               vv=this_obj.fields[this_obj.widgets[w].model.field].value
-               //vv=this_obj.field[this_obj.widgets[w]].value
-               console.log(vv)
-               $("#"+w).val(vv)
+               //console.log(w)
+               k=this_obj.widgets[w].model.field
+               value=this_obj.fields[k].value
+               $("#"+w).val(value)
+               values[k]=value
              }
+             //this_obj.values=values
            },
           complete:function(result)
           {
             console.log('load_content call completed...')
+            this_obj.values=values
           },
         });
 }
+
+
+MeForm.prototype.save_content = function()
+{
+  console.log(this.values)
+}
+
 
 
 //////////////////////////////// FormWidget ///////////////////////////////////
@@ -324,7 +332,6 @@ function FWidget(form,field)
   this.json=null
   //this.scripts={}
 }
-
 
 function FWHidden(form,field)
 {
@@ -356,11 +363,11 @@ FWText.prototype.afterRender=function()
 
 function FWTextOnChange(container,field,event)
 {
-    console.log($(this));
-    console.log($(event));
-    wdg=eval(container+'_form.fields.'+field)
-    wdg.value=$("#"+container+"_"+field).val()
-    wdg.json=wdg.value
+    v=$("#"+container+"_"+field).val()
+    //wdg=eval(container+'_form.fields.'+field)
+    frm=eval(container+'_form')
+    frm.values[field]=v
+    frm.fields[field].json=v
 }
 
 
@@ -384,13 +391,12 @@ FWNumber.prototype.afterRender=function()
 
 function FWNumberOnChange(container,field,event)
 {
-    console.log($(this));
-    console.log($(event));
-    wdg=eval(container+'_form.fields.'+field)
-    wdg.value=$("#"+container+"_"+field).val()
-    wdg.json=wdg.value
+    v=$("#"+container+"_"+field).val()
+    //wdg=eval(container+'_form.fields.'+field)
+    frm=eval(container+'_form')
+    frm.values[field]=v
+    frm.fields[field].json=v
 }
-
 
 
 function FWSelect(form,f)
@@ -415,9 +421,10 @@ FWSelect.prototype.afterRender=function()
 
 function FWSelectOnChange(container,field)
 {
-    wdg=eval(container+'_form.fields.'+field)
-    wdg.value=$("#"+container+"_"+field).val()
-    wdg.json=wdg.value
+    v=$("#"+container+"_"+field).val()
+    frm=eval(container+'_form')
+    frm.values[field]=v
+    frm.fields[field].json=v
 }
 
 
@@ -677,15 +684,18 @@ function FWSwitch(form,f)
   this.html='<div class="form-group row">'
          +'<label for="'+this.model.field+'" class="col-sm-2 col-form-label">'
          +this.model.label+'</label>'
-         +'<div class="col-sm-5">'
+         +'<div class=  "col-sm-5">'
          +'<input class="form-control" id="'+this.id+'" type="checkbox" data-toggle="toggle" '
-         +'data-on="Ready" data-off="Not Ready" >'
+         +'data-on="'+this.model.state_labels.on
+         +'" data-off="'+this.model.state_labels.off+'" >'
          +'</div></div>'
 }
 
 FWSwitch.prototype.afterRender=function()
 {
   $('#'+this.id).bootstrapToggle();
+  $('div.toggle').height('auto')
+  this.form.fields[this.model.field]={'value':false}
 }
 
 function FWSwitchOnChange(container,field)
