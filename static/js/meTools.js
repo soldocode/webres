@@ -312,9 +312,24 @@ MeForm.prototype.load_content = function(model_name,id)
 }
 
 
-MeForm.prototype.save_content = function()
+MeForm.prototype.updateData = function()
 {
   console.log(this.values)
+  var this_obj=this
+  $.ajax({url:this.app_url+'update_data_'+this.divId,
+          type:"POST",
+          data:this.values,
+          dataType: "json",
+          success:function(result)
+           {
+             console.log('updateData called...')
+             alert(result.msg)
+           },
+          complete:function(result)
+          {
+            console.log('updateData call completed...')
+          },
+        });
 }
 
 
@@ -330,14 +345,12 @@ function FWidget(form,field)
   this.class=field.class
   this.html=''
   this.json=null
-  //this.scripts={}
 }
 
 function FWHidden(form,field)
 {
   FWidget.call(this,form,field);
   this.html='<div hidden="true" class="form-group row"></div>'
-
 }
 
 FWHidden.prototype.afterRender=function(){}
@@ -364,10 +377,10 @@ FWText.prototype.afterRender=function()
 function FWTextOnChange(container,field,event)
 {
     v=$("#"+container+"_"+field).val()
-    //wdg=eval(container+'_form.fields.'+field)
     frm=eval(container+'_form')
     frm.values[field]=v
     frm.fields[field].json=v
+    frm.updateData()
 }
 
 
@@ -396,10 +409,11 @@ function FWNumberOnChange(container,field,event)
     frm=eval(container+'_form')
     frm.values[field]=v
     frm.fields[field].json=v
+    frm.updateData()
 }
 
 
-function FWSelect(form,f)
+function FWSelect(form,f,value_is_int=true)
 {
   FWidget.call(this,form,f);
   this.html='<div class="form-group row">'
@@ -412,19 +426,23 @@ function FWSelect(form,f)
     this.html+='<option value="'+f.values[o][1]+'">'+f.values[o][0]+'</option>'
   }
   this.html+='</select></div></div>'
+  this.value_is_int=value_is_int
 }
 
 FWSelect.prototype.afterRender=function()
 {
-  this.form.fields[this.model.field]={'value':''}
+  this.form.fields[this.model.field]={'value':'','value_is_int':this.value_is_int}
 }
 
 function FWSelectOnChange(container,field)
 {
     v=$("#"+container+"_"+field).val()
     frm=eval(container+'_form')
-    frm.values[field]=v
+    vsi=(frm.fields[field].value_is_int)
+    if (vsi)frm.values[field]=parseInt(v);
+    else frm.values[field]=v
     frm.fields[field].json=v
+    frm.updateData()
 }
 
 
@@ -599,6 +617,7 @@ function FWRangeNumberOnChange(container,field)
 
     wdg.value=value
     wdg.json=wdg.value
+    frm.updateData()
 }
 
 
@@ -619,7 +638,7 @@ function FWRangeNumberRangeOnChange(container,field,count)
       $("label#"+wdg_id+"_"+newcount).text('da '+range_value+' fino a')
     }
     //console.log($("label#"+wdg_id+"_range_"+count).val())
-
+    frm.updateData()
 }
 
 
@@ -686,8 +705,12 @@ function FWSwitch(form,f)
          +this.model.label+'</label>'
          +'<div class=  "col-sm-5">'
          +'<input class="form-control" id="'+this.id+'" type="checkbox" data-toggle="toggle" '
-         +'data-on="'+this.model.state_labels.on
-         +'" data-off="'+this.model.state_labels.off+'" >'
+         +'data-on="'+this.model.state_labels.on+'" '
+         +'data-off="'+this.model.state_labels.off+'" '
+         +'data-onstyle="'+this.model.state_colors.on+'" '
+         +'data-offstyle="'+this.model.state_colors.off+'" '
+         +'onchange="FWSwitchOnChange(\''+form.divId+'\',\''+this.model.field+'\')"'
+         +'>'
          +'</div></div>'
 }
 
@@ -699,7 +722,11 @@ FWSwitch.prototype.afterRender=function()
 }
 
 function FWSwitchOnChange(container,field)
-{}
+{
+  frm=eval(container+'_form')
+  frm.values[field]=$('#'+container+'_'+field).prop('checked')
+  frm.updateData()
+}
 
 
 FormWidget={'text':FWText,
