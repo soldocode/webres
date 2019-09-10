@@ -4,9 +4,10 @@
 
 ///////////////////////////////// MeIndex /////////////////////////////////////
 
-function MeIndex(divId)
+function MeIndex(id)
 {
-  this.divId=divId
+  this.divId=id
+  this.id=id
   this.model=[]
   this.html='<div id='+this.divId+'><h3>Index of '+this.divId+'</h3></div>'
   this.filter_loader=""
@@ -14,11 +15,11 @@ function MeIndex(divId)
   this.filters={}
 }
 
-MeIndex.prototype.load_model = function (model_name)
+MeIndex.prototype.load_model = function ()
 {
   var this_obj=this
   var dfd = $.Deferred();
-  $.ajax({url:this.app_url+'load_model_'+model_name,
+  $.ajax({url:this.app_url+'load_model_'+this.id,
           type:"POST",
           dataType: "json",
           success:function(result)
@@ -36,6 +37,7 @@ MeIndex.prototype.load_model = function (model_name)
   console.log('load_mode funct end...')
   return dfd.promise();
 }
+
 
 MeIndex.prototype.render_model = function ()
 {
@@ -71,7 +73,7 @@ MeIndex.prototype.render_model = function ()
 }
 
 
-MeIndex.prototype.load_filters = function (path)
+MeIndex.prototype.load_filters = function ()
 {
   var dfd = $.Deferred();
   var filters=[]
@@ -218,21 +220,22 @@ MeIndex.prototype.hide = function ()
 
 ///////////////////////////////// MeForm /////////////////////////////////////
 
-function MeForm(divId)
+function MeForm(id)
 {
-  this.divId=divId
+  this.divId=id
+  this.id=id
   this.model=[]
-  this.html='<div id='+this.divId+'><h3>Form of '+this.divId+'</h3></div>'
+  this.html='<div id='+this.id+'><h3>Form of '+this.id+'</h3></div>'
   this.fields={}
   this.widgets={}
   this.values={}
 }
 
-MeForm.prototype.load_model = function (model_name)
+MeForm.prototype.load_model = function ()
 {
   var this_obj=this
   var dfd = $.Deferred();
-  $.ajax({url:this.app_url+'load_model_'+model_name,
+  $.ajax({url:this.app_url+'load_model_'+this.id,
           type:"POST",
           dataType: "json",
           success:function(result)
@@ -277,12 +280,12 @@ MeForm.prototype.render_model = function ()
 
 
 
-MeForm.prototype.load_content = function(model_name,id)
+MeForm.prototype.load_content = function(id)
 {
   values={}
   values.id=id
   var this_obj=this
-  $.ajax({url:this.app_url+'load_content_'+model_name,
+  $.ajax({url:this.app_url+'load_content_'+this.id,
           type:"POST",
           data:values,
           dataType: "json",
@@ -334,6 +337,68 @@ MeForm.prototype.updateData = function()
 
 
 
+/////////////////////////////////// MeTable ///////////////////////////////////
+
+
+function MeTable(id)
+{
+  this.id=id
+  this.model=[]
+  this.html='<div id='+this.id+'><h3>Index of '+this.id+'</h3></div>'
+  this.content=[]
+}
+
+MeTable.prototype.load_model = function ()
+{
+  var this_obj=this
+  var dfd = $.Deferred();
+  $.ajax({url:this.app_url+'load_model_'+this.id,
+          type:"POST",
+          dataType: "json",
+          success:function(result)
+          {
+            this_obj.model=result.model
+            console.log('load_mode call successful...')
+          },
+          complete:function()
+          {
+            this_obj.render_model()
+            console.log('load_mode call completed...')
+            dfd.resolve();
+          }
+         });
+  console.log('load_mode funct end...')
+  return dfd.promise();
+}
+
+
+MeTable.prototype.render_model = function ()
+{
+  html='<table class="table table-striped" id="table_'+this.id+'">'
+  html+='<colgroup>'
+  for (i in this.model)
+  {
+    html+='<col width="'+this.model[i].width+'%">'
+  }
+  html+='</colgroup>'
+  html+='<thead>'
+  html+='<tr>'
+  for (i in this.model)
+  {
+    html+='<th>'+this.model[i].label+'</th>'
+  }
+  html+='</tr>'
+  html+='</thead>'
+  html+='<tbody id="rows_'+this.id+'"></tbody>'
+  html+='</table>'
+  this.html=html;
+
+  $("div#"+this.id).html(this.html);
+
+}
+
+
+
 //////////////////////////////// FormWidget ///////////////////////////////////
 
 
@@ -346,6 +411,7 @@ function FWidget(form,field)
   this.html=''
   this.json=null
 }
+
 
 function FWHidden(form,field)
 {
@@ -477,7 +543,7 @@ FWFlowchart.prototype.afterRender=function(){
    };
 
    var options = {
-     height:'250px',
+     height:'350px',
      layout: {
        randomSeed: undefined,
        improvedLayout:true,
