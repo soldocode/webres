@@ -358,16 +358,16 @@ MeTable.prototype.load_model = function ()
           success:function(result)
           {
             this_obj.model=result.model
-            console.log('load_mode call successful...')
+            console.log('load_model_'+this_obj.id+' call successful...')
           },
           complete:function()
           {
             this_obj.render_model()
-            console.log('load_mode call completed...')
+            console.log('load_model_'+this_obj.id+' call completed...')
             dfd.resolve();
           }
          });
-  console.log('load_mode funct end...')
+  console.log('load_model_'+this_obj.id+' funct end...')
   return dfd.promise();
 }
 
@@ -395,6 +395,85 @@ MeTable.prototype.render_model = function ()
 
   $("div#"+this.id).html(this.html);
 
+}
+
+
+MeTable.prototype.load_content = function(id)
+{
+  values={}
+  values.id=id
+  var this_obj=this
+  $.ajax({url:this.app_url+'load_content_'+this.id,
+          type:"POST",
+          data:values,
+          dataType: "json",
+          success:function(result)
+           {
+             console.log('load_content_'+this_obj.id+' call succsefull...')
+             this_obj.content=result.rows
+           },
+          complete:function(result)
+          {
+            //this_obj.render_content()
+            console.log('load_content_'+this_obj.id+' call completed...')
+          },
+        });
+}
+
+
+MeTable.prototype.render_content = function()
+{
+ html=''
+ for (var i in this.content)
+ {
+   html+='<tr id="'+i+'">'
+   var row=this.content[i]
+   for (var c in this.model)
+   {
+      var field=this.model[c].field
+      var cls=this.model[c].class
+      html+='<td>'
+      switch (cls)
+      {
+        case 'link':
+          html+='<a class="link text-decoration-none" '
+          html+='href="'+this.model[c].url+'?id='+row.id+'">'
+          html+='<b>'+row[field]+'</b>'
+          html+='</a>'
+          break;
+        case 'row':
+          html+='P0'+row[field]
+          break;
+        case 'number':
+          html+=row[field]
+          break;
+        case 'date':
+          date=row[field].split('-')
+          html+=date[2]+'/'+date[1]+'/'+date[0]
+          break;
+        case 'select':
+          //var options=this.filters[field]
+          //var cnt='Indefinito'
+          //for (o in options)
+          //{
+          //  if (options[o][1]==row[field])
+          //  {
+          //    cnt=options[o][0]
+          //  }
+          //}
+          //html+=cnt
+          html+=row[field]
+          break;
+        case 'text':
+          text=row[field]
+          if (text){html+=row[field]}
+          break;
+      }
+      html+='</td>'
+   }
+   html+='</tr>'
+ }
+ $("tbody#rows_"+this.id).html(html);
 }
 
 
