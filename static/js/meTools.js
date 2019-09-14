@@ -374,7 +374,7 @@ MeTable.prototype.load_model = function ()
 
 MeTable.prototype.render_model = function ()
 {
-  html='<table class="table table-striped" id="table_'+this.id+'">'
+  html='<table class="table table-hover table-striped" id="table_'+this.id+'">'
   html+='<colgroup>'
   for (i in this.model)
   {
@@ -383,7 +383,7 @@ MeTable.prototype.render_model = function ()
   html+='</colgroup>'
   html+='<thead>'
   html+='<tr>'
-  for (i in this.model)
+  for (i = 1; i < this.model.length; i++)
   {
     html+='<th>'+this.model[i].label+'</th>'
   }
@@ -416,6 +416,7 @@ MeTable.prototype.load_content = function(id)
           {
             //this_obj.render_content()
             console.log('load_content_'+this_obj.id+' call completed...')
+            this_obj.render_content()
           },
         });
 }
@@ -426,8 +427,9 @@ MeTable.prototype.render_content = function()
  html=''
  for (var i in this.content)
  {
-   html+='<tr id="'+i+'">'
    var row=this.content[i]
+   row_id=(row[this.model[0].field])
+   html+='<tr id="'+row_id+'" onclick="console.log('+row_id+')">'
    for (var c in this.model)
    {
       var field=this.model[c].field
@@ -463,6 +465,9 @@ MeTable.prototype.render_content = function()
           //}
           //html+=cnt
           html+=row[field]
+          break;
+        case 'smart_select':
+          html+=this.model[c].values.id[row[field]]
           break;
         case 'text':
           text=row[field]
