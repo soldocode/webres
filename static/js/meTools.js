@@ -376,7 +376,7 @@ MeTable.prototype.render_model = function ()
 {
   html='<table class="table table-hover table-striped" id="table_'+this.id+'">'
   html+='<colgroup>'
-  for (i in this.model)
+  for (i = 1; i < this.model.length; i++)
   {
     html+='<col width="'+this.model[i].width+'%">'
   }
@@ -429,8 +429,8 @@ MeTable.prototype.render_content = function()
  {
    var row=this.content[i]
    row_id=(row[this.model[0].field])
-   html+='<tr id="'+row_id+'" onclick="console.log('+row_id+')">'
-   for (var c in this.model)
+   html+='<tr id="'+row_id+'" onclick="'+this.id+'_table.edit_row('+row_id+')">'
+   for (c = 1; c < this.model.length; c++)
    {
       var field=this.model[c].field
       var cls=this.model[c].class
@@ -444,7 +444,7 @@ MeTable.prototype.render_content = function()
           html+='</a>'
           break;
         case 'row':
-          html+='P0'+row[field]
+          html+='P'+(row[field] < 10 ? '0' : '') + row[field]
           break;
         case 'number':
           html+=row[field]
@@ -481,7 +481,11 @@ MeTable.prototype.render_content = function()
  $("tbody#rows_"+this.id).html(html);
 }
 
-
+MeTable.prototype.edit_row = function(id)
+{
+  console.log('edito',id)
+  $("tr#"+id).html('<p>Modifica!!!</p>');
+}
 
 //////////////////////////////// FormWidget ///////////////////////////////////
 
