@@ -346,6 +346,7 @@ function MeTable(id)
   this.model=[]
   this.html='<div id='+this.id+'><h3>Index of '+this.id+'</h3></div>'
   this.content=[]
+  this.on_edit={active:false,row_id:null}//???????????????
 }
 
 MeTable.prototype.load_model = function ()
@@ -434,7 +435,7 @@ MeTable.prototype.render_content = function()
    {
       var field=this.model[c].field
       var cls=this.model[c].class
-      html+='<td>'
+      html+='<td id="'+row_id+'_'+field+'">'
       switch (cls)
       {
         case 'link':
@@ -483,8 +484,34 @@ MeTable.prototype.render_content = function()
 
 MeTable.prototype.edit_row = function(id)
 {
-  console.log('edito',id)
-  $("tr#"+id).html('<p>Modifica!!!</p>');
+  if (this.on_edit.row_id!=id)
+  {
+  this.on_edit.row_id=id
+  html=''
+  for (i = 1; i < this.model.length; i++)
+  {
+     var field=this.model[i].field
+     var cls=this.model[i].class
+     html+='<td class="px-1">'
+     switch (cls)
+     {
+       case 'number':
+         v=$("td#"+id+"_"+field).text()
+         html+='<input type="number" onchange="console.log(1)" '
+         html+='class="form-control px-2" id="edit_'+field+'" '
+         html+='value='+v+' >'
+         break;
+       case 'text':
+         v=$("td#"+id+"_"+field).text()
+         html+='<input type="text" onchange="console.log(2)" '
+         html+='class="form-control px-2" id="edit_'+field+'" '
+         html+='value="'+v+'">'
+         break;
+     }
+     html+='</td>'
+  }
+  $("tr#"+id).html(html);
+}
 }
 
 //////////////////////////////// FormWidget ///////////////////////////////////
