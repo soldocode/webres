@@ -377,16 +377,19 @@ MeTable.prototype.render_model = function ()
 {
   html='<table class="table table-hover table-striped" id="table_'+this.id+'">'
   html+='<colgroup>'
-  for (i = 1; i < this.model.length; i++)
+  for (i = 0; i < this.model.length; i++)
   {
     html+='<col width="'+this.model[i].width+'%">'
   }
   html+='</colgroup>'
   html+='<thead>'
   html+='<tr>'
-  for (i = 1; i < this.model.length; i++)
+  for (i = 0; i < this.model.length; i++)
   {
-    html+='<th>'+this.model[i].label+'</th>'
+    if (this.model[i].class=='hidden')
+      {html+='<th style="display:none" >'+this.model[i].label+'</th>'}
+    else
+      {html+='<th>'+this.model[i].label+'</th>'}
   }
   html+='</tr>'
   html+='</thead>'
@@ -404,6 +407,7 @@ MeTable.prototype.load_content = function(id)
   values={}
   values.id=id
   var this_obj=this
+  var dfd = $.Deferred();
   $.ajax({url:this.app_url+'load_content_'+this.id,
           type:"POST",
           data:values,
@@ -418,8 +422,10 @@ MeTable.prototype.load_content = function(id)
             //this_obj.render_content()
             console.log('load_content_'+this_obj.id+' call completed...')
             this_obj.render_content()
+            dfd.resolve();
           },
         });
+  return dfd.promise();
 }
 
 
@@ -430,14 +436,21 @@ MeTable.prototype.render_content = function()
  {
    var row=this.content[i]
    row_id=(row[this.model[0].field])
-   html+='<tr id="'+row_id+'" onclick="'+this.id+'_table.edit_row('+row_id+')">'
-   for (c = 1; c < this.model.length; c++)
+   html+='<tr id="'+row_id+'" onclick="'+this.id+'_table.edit_row(&quot;'+row_id+'&quot;)">'
+   for (c = 0; c < this.model.length; c++)
    {
       var field=this.model[c].field
       var cls=this.model[c].class
-      html+='<td id="'+row_id+'_'+field+'">'
+      if (cls=='hidden')
+        {html+='<td style="display:none" id="'+row_id+'_'+field+'">'}
+      else
+        {html+='<td id="'+row_id+'_'+field+'">'}
       switch (cls)
       {
+        case 'hidden':
+          text=row[field]
+          if (text){html+=row[field]}
+          break;
         case 'link':
           html+='<a class="link text-decoration-none" '
           html+='href="'+this.model[c].url+'?id='+row.id+'">'
@@ -453,6 +466,14 @@ MeTable.prototype.render_content = function()
         case 'date':
           date=row[field].split('-')
           html+=date[2]+'/'+date[1]+'/'+date[0]
+          break;
+        case 'datetime':
+          if (row[field])
+          {
+             dt=row[field].split(' ')
+             date=dt[0].split('-')
+             html+=date[2]+'/'+date[1]+'/'+date[0]+' '+dt[1]
+          }
           break;
         case 'select':
           //var options=this.filters[field]
