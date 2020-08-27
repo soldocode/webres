@@ -92,31 +92,37 @@ MeIndex.prototype.load_filters = function ()
 
 MeIndex.prototype.load_filter = function (filters)
 {
-  var dfd = $.Deferred();
   var this_obj=this
-  if (filters.length==0)
+  if (filters.length!=0)
   {
-      dfd.resolve();
-  }
-  else
-  {
+      var dfd = $.Deferred();
       var filter=filters.pop()
-      $.ajax({url:this.filter_loader+filter[0].origin,
-          type:"POST",
-          data:null,
-          dataType: "json",
-          success:function(result)
-           {
-             this_obj.filters[filter[1]]=result.options
-           },
-          complete:function(result){
-             console.log('load filter'+filter[0].origin+' complete...')
-             $.when(this_obj.load_filter(filters)).done(function(){dfd.resolve()})
-             this_obj.render_filter(filter[1],filter[0].default)
-          }
-        });
+      if (filter[0].class=='content')
+      {
+        console.log(filter[0].class)
+        console.log('load filter '+filter[0].origin+' complete...')
+        $.when(this_obj.load_filter(filters)).done(function(){dfd.resolve()})
+        this_obj.render_filter_bycontent(filter[1])
+      }
+      else
+      {
+        $.ajax({url:this.filter_loader+filter[0].origin,
+                type:"POST",
+                data:null,
+                dataType: "json",
+                success:function(result)
+                 {
+                   this_obj.filters[filter[1]]=result.options
+                 },
+                complete:function(result){
+                   console.log('load filter '+filter[0].origin+' complete...')
+                   $.when(this_obj.load_filter(filters)).done(function(){dfd.resolve()})
+                   this_obj.render_filter(filter[1],filter[0].default)
+            }
+          });
+      }
+      return dfd.promise()
   }
-  return dfd.promise()
 }
 
 
@@ -137,6 +143,17 @@ MeIndex.prototype.render_filter=function (id,value)
 }
 
 
+MeIndex.prototype.render_filter_bycontent=function (id)
+{
+  html='<h3 onchange="update_content()">'
+  html+="</h3>"
+  html='<input type="text" onchange="update_content()" '
+  html+='class="form-control px-1" style="padding:1px" id="edit_filter_'+id+'" >'
+  $("th#filter_"+id).html(html);
+  console.log('render filter complete...')
+}
+
+
 MeIndex.prototype.load_content = function(rec_min,rec_range,filters)
 {
   values={}
@@ -144,7 +161,7 @@ MeIndex.prototype.load_content = function(rec_min,rec_range,filters)
   values.rec_range=rec_range
   values.filters=filters
   var this_obj=this
-  $.ajax({url:this.app_url+'load_content',
+  $.ajax({url:this.app_url+'load_content_'+this.id,
           type:"POST",
           data:values,
           dataType: "json",
@@ -197,6 +214,14 @@ MeIndex.prototype.render_content = function()
         case 'text':
           html+=row[field]
           break;
+        case 'datetime':
+          if (row[field])
+          {
+             dt=row[field].split(' ')
+             date=dt[0].split('-')
+             html+=date[2]+'/'+date[1]+'/'+date[0]+' '+dt[1]
+          }
+          break;
       }
       html+='</td>'
    }
@@ -205,6 +230,11 @@ MeIndex.prototype.render_content = function()
  $("tbody#rows_"+this.divId).html(html);
 }
 
+
+MeIndex.prototype.updateContent= function()
+{
+  console.log('update_content start...')
+}
 
 MeIndex.prototype.show = function ()
 {
@@ -292,22 +322,38 @@ MeForm.prototype.load_content = function(id)
           success:function(result)
            {
              console.log('load_content call succsefull...')
-             for (v in result.values)
-             {
-               this_obj.fields[v].value=result.values[v]
-             }
-             for (w in this_obj.widgets)
-             {
+             //console.log(result)
+            // for (v in result.values)
+            // {
+            //   this_obj.fields[v].value=result.values[v]
+            // }
+            // for (w in this_obj.widgets)
+            // {
                //console.log(w)
-               k=this_obj.widgets[w].model.field
-               value=this_obj.fields[k].value
-               $("#"+w).val(value)
-               values[k]=value
-             }
+            //   k=this_obj.widgets[w].model.field
+            //   value=this_obj.fields[k].value
+            //   $("#"+w).val(value)
+            //   values[k]=value
+            // }
              //this_obj.values=values
            },
           complete:function(result)
           {
+            r=result.responseJSON.values
+            console.log(r)
+            console.log(this_obj)
+            for (v in r)
+            {
+              this_obj.fields[v].value=r[v]
+            }
+            for (w in this_obj.widgets)
+            {
+              console.log(w)
+              k=this_obj.widgets[w].model.field
+              value=this_obj.fields[k].value
+              $("#"+w).val(value)
+              values[k]=value
+            }
             console.log('load_content call completed...')
             this_obj.values=values
           },
